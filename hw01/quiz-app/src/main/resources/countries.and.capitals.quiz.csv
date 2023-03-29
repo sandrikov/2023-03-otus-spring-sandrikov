@@ -1,0 +1,16 @@
+Q;A;Choose the capital of Morocco;3
+O;1;Baku
+O;2;Nassau
+O;3;Rabat
+O;4;Dhaka
+Q;B;Type the capital of Russia;Moscow
+Q;C;Choose the capital of Turkmenistan;2
+O;1;Santiago
+O;2;Ashgabat
+O;3;Beijing
+Q;D;Select russian cities;1 3
+O;1;Vladimir
+O;2;Havana
+O;3;Kaluga
+O;4;Prague
+Q;E;Type the capital of Azerbaijan;Baku
