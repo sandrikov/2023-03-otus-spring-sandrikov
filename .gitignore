@@ -4,4 +4,9 @@ target/
 
 # Log file
 *.log
+*.iml
 
+.settings/
+.project
+.classpath
+.metadata
