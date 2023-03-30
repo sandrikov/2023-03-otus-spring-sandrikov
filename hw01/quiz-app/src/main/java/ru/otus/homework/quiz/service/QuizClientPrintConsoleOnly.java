@@ -19,13 +19,13 @@ public class QuizClientPrintConsoleOnly implements QuizClient {
         QuizResult result = new QuizResult(studentName);
 
         for (var q : quiz.questionDeque()) {
-            askQuestion(result, q);
+            result.getAnswerList().add(askQuestion(q));
         }
 
         return result;
     }
 
-    private static void askQuestion(QuizResult result, Question q) {
+    private Answer askQuestion(Question q) {
         System.out.printf("\n%-2s %-35s:\n", q.getId(), q.getText());
         if (!q.getOptionList().isEmpty()) {
             for (var o : q.getOptionList()) {
@@ -36,6 +36,6 @@ public class QuizClientPrintConsoleOnly implements QuizClient {
 
         System.out.printf("> %s%n", String.join(" ", q.getAnswerSet())); // TODO reader.next() and check
         answer.getAnswerSet().addAll(q.getAnswerSet());
-        result.getAnswerList().add(answer);
+        return answer;
     }
 }

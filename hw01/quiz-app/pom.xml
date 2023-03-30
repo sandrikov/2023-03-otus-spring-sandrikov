@@ -13,6 +13,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>6.0.6</spring.version>
+        <unit-jupiter-engine.version>5.9.2</unit-jupiter-engine.version>
         <maven-assembly-plugin.version>3.5.0</maven-assembly-plugin.version>
         <checkstyle-plugin.version>3.2.1</checkstyle-plugin.version>
         <checkstyle.version>10.9.3</checkstyle.version>
@@ -24,6 +25,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${unit-jupiter-engine.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
