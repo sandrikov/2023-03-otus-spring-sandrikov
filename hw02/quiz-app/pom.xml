@@ -92,7 +92,7 @@
                             </descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>ru.otus.homework.quiz.Main</mainClass>
+                                    <mainClass>ru.otus.homework.Main</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
