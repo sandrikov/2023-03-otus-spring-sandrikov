@@ -1,0 +1,17 @@
+Countries and Capitals;3
+CHOOSE_OPTION;A;Choose the capital of Morocco;3
+OPTION;1;Baku
+OPTION;2;Nassau
+OPTION;3;Rabat
+OPTION;4;Dhaka
+TEXT_QUESTION;B;Type the capital of Russia;Moscow
+CHOOSE_OPTION;C;Choose the capital of Turkmenistan;2
+OPTION;1;Santiago
+OPTION;2;Ashgabat
+OPTION;3;Beijing
+SELECT_OPTIONS;D;Select russian cities;1 3
+OPTION;1;Vladimir
+OPTION;2;Havana
+OPTION;3;Kaluga
+OPTION;4;Prague
+TEXT_QUESTION;E;Type the capital of Azerbaijan;Baku
