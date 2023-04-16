@@ -1,0 +1,12 @@
+spring:
+  messages:
+    basename: "i18n-test/appmessages"
+    encoding: "UTF-8"
+  application:
+    name: quiz-junit
+  config:
+    import: quiz-test.yml
+
+application:
+  locale: de
+  version: 1.3
