@@ -1,0 +1,53 @@
+application:
+  quiz:
+    id: q1
+    name: ${q1.name}
+    passing-score: 3
+    questions:
+    - id: A
+      text: ${q1.question.a.text}
+      rightAnswer: 3
+      availableOptions:
+        - id: 1
+          text: ${q1.question.a.option.1.text}
+        - id: 2
+          text: ${q1.question.a.option.2.text}
+        - id: 3
+          text: ${q1.question.a.option.3.text}
+        - id: 4
+          text: ${q1.question.a.option.4.text}
+      answerType: OPTION_ID
+    - id: B
+      answerType: TEXT
+      text: ${q1.question.b.text}
+      rightAnswer: ${q1.question.b.answer}
+      availableOptions: []
+    - id: C
+      answerType: OPTION_ID
+      text: ${q1.question.c.text}
+      rightAnswer: 2
+      availableOptions:
+        - id: 1
+          text: ${q1.question.c.option.1.text}
+        - id: 2
+          text: ${q1.question.c.option.2.text}
+        - id: 3
+          text: ${q1.question.c.option.3.text}
+    - id: D
+      answerType: OPTION_SET
+      text: ${q1.question.d.text}
+      rightAnswer: [1, 3]
+      availableOptions:
+        - id: 1
+          text: ${q1.question.d.option.1.text}
+        - id: 2
+          text: ${q1.question.d.option.2.text}
+        - id: 3
+          text: ${q1.question.d.option.3.text}
+        - id: 4
+          text: ${q1.question.d.option.4.text}
+    - id: E
+      answerType: TEXT
+      text: ${q1.question.e.text}
+      rightAnswer: ${q1.question.e.answer}
+      availableOptions: []

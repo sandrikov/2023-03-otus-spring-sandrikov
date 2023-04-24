@@ -1,0 +1,15 @@
+{
+  "properties": [
+    {
+      "name": "application.version",
+      "type": "java.lang.String",
+      "description": "Application version."
+    },
+    {
+      "name": "application.locale",
+      "type": "java.util.Locale",
+      "description": "Application locale.",
+      "defaultValue": "en"
+    }
+  ]
+}
