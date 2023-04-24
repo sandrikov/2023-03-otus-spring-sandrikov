@@ -1,0 +1,18 @@
+spring:
+  messages:
+    basename: "i18n/appmessages"
+    encoding: "UTF-8"
+  application:
+    name: quiz-junit
+  shell:
+    interactive:
+      enabled: false
+
+application:
+  version: 1.4
+  locale: de
+  io:
+    input: test
+    silent: false
+  resource:
+    location: quiz_@{locale}.csv

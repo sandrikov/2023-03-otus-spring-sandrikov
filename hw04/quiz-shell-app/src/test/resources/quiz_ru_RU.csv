@@ -1,0 +1,12 @@
+Тестовая викторина;3
+CHOOSE_OPTION;A;Выберите два;2
+OPTION;1;Раз
+OPTION;2;Два
+OPTION;3;Три
+OPTION;4;Четыре
+TEXT_QUESTION;B;Напишите слово 'Кот'';Кот
+CHOOSE_OPTION;C;Выберите один и три;3
+OPTION;1;Раз
+OPTION;2;Два
+OPTION;3;Три
+OPTION;4;Четыре

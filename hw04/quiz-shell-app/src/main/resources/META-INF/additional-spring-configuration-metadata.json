@@ -1,0 +1,28 @@
+{"properties": [
+  {
+    "name": "application.version",
+    "type": "java.lang.String",
+    "description": "Application version."
+  },
+  {
+    "name": "application.locale",
+    "type": "java.util.Locale",
+    "description": "Application locale.",
+    "defaultValue": "en"
+  },
+  {
+    "name": "application.io.input",
+    "type": "java.lang.String",
+    "description": "Input stream source."
+  },
+  {
+    "name": "application.io.silent",
+    "type": "java.lang.String",
+    "description": "Turn off output."
+  },
+  {
+    "name": "application.resource.location",
+    "type": "java.lang.String",
+    "description": "Resource location."
+  }
+]}

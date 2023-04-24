@@ -1,0 +1,17 @@
+Столицы и Страны;3
+CHOOSE_OPTION;A;Выберите столицу Марокко;3
+OPTION;1;Берлин
+OPTION;2;Нассау
+OPTION;3;Рабат
+OPTION;4;Дакка
+TEXT_QUESTION;B;Введите столицу России;Москва
+CHOOSE_OPTION;C;Выберите столицу Туркменистана;2
+OPTION;1;Сантьяго
+OPTION;2;Ашхабад
+OPTION;3;Пекин
+SELECT_OPTIONS;D;Выберите российские города;1 3
+OPTION;1;Владимир
+OPTION;2;Гавана
+OPTION;3;Калуга
+OPTION;4;Прага
+TEXT_QUESTION;E;Введите столицу Азербайджана;Баку

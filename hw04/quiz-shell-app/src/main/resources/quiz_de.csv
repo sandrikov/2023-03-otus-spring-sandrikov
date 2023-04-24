@@ -1,0 +1,17 @@
+Länder und Hauptstädte;3
+CHOOSE_OPTION;A;Wählen Sie die Hauptstadt von Marokko;3
+OPTION;1;Berlin
+OPTION;2;Nassau
+OPTION;3;Rabat
+OPTION;4;Dhaka
+TEXT_QUESTION;B;Geben Sie die Hauptstadt von Russland ein;Moskau
+CHOOSE_OPTION;C;Wählen Sie die Hauptstadt von Turkmenistan;2
+OPTION;1;Santiago
+OPTION;2;Aschgabat
+OPTION;3;Peking
+SELECT_OPTIONS;D;Russische Städte auswählen;1 3
+OPTION;1;Wladimir
+OPTION;2;Havanna
+OPTION;3;Kaluga
+OPTION;4;Prag
+TEXT_QUESTION;E;Geben Sie die Hauptstadt von Aserbaidschan ein;Baku

@@ -1,0 +1,12 @@
+Quiz JUnit;3
+CHOOSE_OPTION;A;Choose the Two;2
+OPTION;1;One
+OPTION;2;Two
+OPTION;3;Three
+OPTION;4;Four
+TEXT_QUESTION;B;Type 'Cat';Cat
+SELECT_OPTIONS;C;Select One and Three;1 3
+OPTION;1;One
+OPTION;2;Two
+OPTION;3;Three
+OPTION;4;Four
