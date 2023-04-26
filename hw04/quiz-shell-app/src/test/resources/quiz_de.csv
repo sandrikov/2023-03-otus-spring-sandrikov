@@ -1,0 +1,12 @@
+Prüfung JUnit;3
+CHOOSE_OPTION;A;Wähle die Zwei;2
+OPTION;1;Berlin
+OPTION;2;Nassau
+OPTION;3;Rabat
+OPTION;4;Dhaka
+TEXT_QUESTION;B;Geben Sie 'Kat' ein;Kat
+SELECT_OPTIONS;C;Wählen Sie Eins und Drei aus;1 3
+OPTION;1;Eins
+OPTION;2;Zwei
+OPTION;3;Drei
+OPTION;4;Vier
