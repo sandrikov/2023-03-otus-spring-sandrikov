@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+  sql:
+    init:
+      mode: always
+      data-locations: data.sql
+      schema-locations: schema.sql
+    show-sql: true
+
+  application:
+    name: books-app
+
+  shell:
+    command:
+      script:
+        enabled: false
+      version:
+        enabled: false
+#  h2:
+#    console:
+#      path: /h2-consol
+#      settings:
+#        web-allow-others: true
+logging:
+  level:
+    ROOT: ERROR
+
+shell:
+  out:
+    info: BLACK
+    success: GREEN
+    warning: YELLOW
+    error: RED
+    command: BRIGHT
