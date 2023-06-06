@@ -29,9 +29,9 @@ import static ru.otus.homework.books.repository.GenreRepositoryJpaTest.HISTORICA
 import static ru.otus.homework.books.repository.GenreRepositoryJpaTest.HISTORICAL_FICTION_ID;
 import static ru.otus.homework.books.repository.GenreRepositoryJpaTest.UNUSED_GENRE_ID;
 
-@DisplayName("Репозиторий на основе Jdbc для работы с книгами")
+@DisplayName("Репозиторий для работы с книгами")
 @DataJpaTest
-@Import({BookRepositoryJpa.class, AuthorRepositoryJpa.class, GenreRepositoryJpa.class,
+@Import({BookRepositoryJpa.class, AuthorRepositoryJpa.class, GenreRepositoryJpa.class, CommentRepositoryJpa.class,
         GenreMapperImpl.class, AuthorMapperImpl.class, CommentMapperImpl.class, BookProjectionMapperImpl.class})
 public class BookRepositoryJpaTest {
 
@@ -49,10 +49,11 @@ public class BookRepositoryJpaTest {
     public static final String ADVENTURES_OF_TOM_SAWYER = "Приключения Тома Сойера";
     public static final String TOM_SAWYER_DETECTIVES = "Том Сойер, детектив";
 
-
-
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Autowired
     private TestEntityManager em;
@@ -87,7 +88,7 @@ public class BookRepositoryJpaTest {
     void findById() {
         val book = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
         assertTrue(book.isPresent());
-        assertEquals(JEANNE_D_ARC, book.get().getTitle(), "Book name");
+        assertEquals(JEANNE_D_ARC, book.get().getTitle(), "Book title");
         assertEquals(MARK_TWAIN, book.get().getAuthor().getName(), "Author name");
         assertEquals(HISTORICAL_FICTION, book.get().getGenre().getName(), "Genre name");
     }
@@ -98,7 +99,7 @@ public class BookRepositoryJpaTest {
         val author = new Author(MARK_TWAIN_ID, MARK_TWAIN);
         val book = bookRepository.findByTitleAndAuthor(JEANNE_D_ARC, author);
         assertTrue(book.isPresent());
-        assertEquals(JEANNE_D_ARC, book.get().getTitle(), "Book name");
+        assertEquals(JEANNE_D_ARC, book.get().getTitle(), "Book title");
         assertEquals(author.getId(), book.get().getAuthor().getId(), "Author ID");
         assertEquals(author.getName(), book.get().getAuthor().getName(), "Author name");
         assertEquals(HISTORICAL_FICTION, book.get().getGenre().getName(), "Genre name");
@@ -161,7 +162,7 @@ public class BookRepositoryJpaTest {
                 .matches(s -> s.getAuthor() != null, "Author is presented")
                 .matches(s -> s.getGenre() != null, "Genre is presented")
                 .isSameAs(saved);
-        assertEquals(THREE_MUSKETEERS, book.getTitle(), "Book name");
+        assertEquals(THREE_MUSKETEERS, book.getTitle(), "Book title");
         assertEquals(MARK_TWAIN, book.getAuthor().getName(), "Author");
         assertEquals(DETECTIVE, book.getGenre().getName(), "Genre");
         assertThat(book.getComments()).isNotNull().hasSize(2);
@@ -199,7 +200,7 @@ public class BookRepositoryJpaTest {
         assertTrue(bookWithStat.isPresent());
         val book = bookWithStat.get();
         assertEquals(3, book.commentCount(), "Comments Count");
-        assertEquals(newTitle, book.title(), "Book name");
+        assertEquals(newTitle, book.title(), "Book title");
         assertEquals(newAuthor.getName(), book.author().getName(), "Author");
         assertEquals(newGenre.getName(), book.genre().getName(), "Genre");
         em.flush();
@@ -210,13 +211,13 @@ public class BookRepositoryJpaTest {
                 .extracting(Comment::getText).contains(comment1NewText, newComment2Text, newComment3Text);
     }
 
-    @DisplayName("Изменение всех аттрибутов книги и каскадное сохранение/удаление комментариев")
+    @DisplayName("Поиск по альтернативному ключу")
     @Test
     void findByTitleAndAuthor() {
         val author = new Author(MARK_TWAIN_ID, MARK_TWAIN);
         val book = bookRepository.findByTitleAndAuthor(JEANNE_D_ARC, author);
         assertTrue(book.isPresent());
-        assertEquals(JEANNE_D_ARC, book.get().getTitle(), "Book name");
+        assertEquals(JEANNE_D_ARC, book.get().getTitle(), "Book title");
         assertEquals(author.getId(), book.get().getAuthor().getId(), "Author id");
         assertEquals(author.getName(), book.get().getAuthor().getName(), "Author name");
         assertEquals(HISTORICAL_FICTION, book.get().getGenre().getName(), "Genre name");
@@ -226,7 +227,11 @@ public class BookRepositoryJpaTest {
     @Test
     void deleteBooksByAuthor() {
         val author = new Author(MARK_TWAIN_ID, MARK_TWAIN);
-        int deleted = bookRepository.deleteAllByAuthor(author);
+        val books = bookRepository.findAllByAuthorAndGenreAndTitle(author, null, null);
+        assertEquals(NUMBER_OF_TWAIN_BOOKS, books.size(), "Number of books");
+
+        commentRepository.deleteAllByBooksInBatch(books);
+        int deleted = bookRepository.deleteAllInBatch(books);
         assertEquals(NUMBER_OF_TWAIN_BOOKS, deleted, "Number of deleted books");
         assertEquals(NUMBER_OF_BOOKS - NUMBER_OF_TWAIN_BOOKS, bookRepository.count(), "Number of rest books");
     }
@@ -247,51 +252,4 @@ public class BookRepositoryJpaTest {
         assertEquals(NUMBER_OF_TWAIN_DETECTIVES, count, "Number of Twain's detectives");
     }
 
-    @Test
-    void findCommentById() {
-        val comment2nd = bookRepository.findCommentById(TWAIN_D_ARK_2ND_COMMENT_ID);
-        assertTrue(comment2nd.isPresent());
-        val comment = comment2nd.get();
-        assertEquals(TWAIN_D_ARK_BOOK_ID, comment.getBook().getId(), "Book Id");
-        assertEquals(NUMBER_OF_TWAIN_D_ARK_COMMENTS, comment.getBook().getComments().size(),
-                "Number of comments");
-    }
-
-    @Test
-    void saveComment() {
-        val text = "Comment #3 " + JEANNE_D_ARC + " of " + MARK_TWAIN;
-
-        val book = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
-        assertTrue(book.isPresent());
-        val commentToAdd = new Comment(text, book.get());
-        bookRepository.saveComment(book.get(), commentToAdd);
-        em.flush();
-        em.clear();
-
-        val bookAfterSave = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
-        assertTrue(bookAfterSave.isPresent());
-        val comments = bookAfterSave.get().getComments();
-        assertEquals(NUMBER_OF_TWAIN_D_ARK_COMMENTS + 1, comments.size(),
-                "Number of comments");
-        assertEquals(text, comments.get(NUMBER_OF_TWAIN_D_ARK_COMMENTS).getText(),
-                "Last comment is our");
-    }
-
-    @Test
-    void deleteComment() {
-        val comment1st = bookRepository.findCommentById(TWAIN_D_ARK_1ST_COMMENT_ID);
-        assertTrue(comment1st.isPresent());
-        val commentToDelete = comment1st.get();
-        bookRepository.deleteComment(commentToDelete.getBook(), commentToDelete);
-        em.flush();
-        em.clear();
-        val bookAfterSave = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
-        assertTrue(bookAfterSave.isPresent());
-        val comments = bookAfterSave.get().getComments();
-        assertEquals(NUMBER_OF_TWAIN_D_ARK_COMMENTS - 1, comments.size(),
-                "Number of comments");
-        assertEquals(TWAIN_D_ARK_2ND_COMMENT_ID,
-                comments.get(NUMBER_OF_TWAIN_D_ARK_COMMENTS - 2).getId(),
-                "Last comment is our");
-    }
 }

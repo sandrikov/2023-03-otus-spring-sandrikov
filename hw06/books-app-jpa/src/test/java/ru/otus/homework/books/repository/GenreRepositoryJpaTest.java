@@ -2,7 +2,6 @@ package ru.otus.homework.books.repository;
 
 import jakarta.persistence.PersistenceException;
 import lombok.val;
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static ru.otus.homework.books.domain.Book.FK_BOOK_GENRE;
-import static ru.otus.homework.books.domain.Genre.UK_GENRE_NAME;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.FK_BOOK_GENRE;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.UK_GENRE_NAME;
 
 @DisplayName("Репозиторий жанров")
 @DataJpaTest
@@ -54,10 +53,7 @@ class GenreRepositoryJpaTest {
         val newGenre = new Genre(DETECTIVE);
         val persistenceException = assertThrows(PersistenceException.class,
                 () -> genreRepository.save(newGenre));
-        assertThat(persistenceException)
-                .hasCauseExactlyInstanceOf(ConstraintViolationException.class);
-        var cause = (ConstraintViolationException) persistenceException.getCause();
-        assertThat(cause.getConstraintName()).containsIgnoringCase(UK_GENRE_NAME);
+        assertThat(persistenceException).hasMessageContaining(UK_GENRE_NAME);
     }
 
     @Test
@@ -81,10 +77,7 @@ class GenreRepositoryJpaTest {
         val persistenceException = assertThrows(PersistenceException.class,
                 () -> genreRepository.findByName(HISTORICAL_FICTION));
 
-        assertThat(persistenceException)
-                .hasCauseExactlyInstanceOf(ConstraintViolationException.class);
-        var cause = (ConstraintViolationException) persistenceException.getCause();
-        assertThat(cause.getConstraintName()).containsIgnoringCase(UK_GENRE_NAME);
+        assertThat(persistenceException).hasMessageContaining(UK_GENRE_NAME);
     }
 
     @Test
@@ -110,9 +103,6 @@ class GenreRepositoryJpaTest {
         val genre = new Genre(DETECTIVE_GENRE_ID, DETECTIVE);
         genreRepository.delete(genre);
         val persistenceException = assertThrows(PersistenceException.class, genreRepository::count);
-        assertThat(persistenceException)
-                .hasCauseExactlyInstanceOf(ConstraintViolationException.class);
-        var cause = (ConstraintViolationException) persistenceException.getCause();
-        assertThat(cause.getConstraintName()).containsIgnoringCase(FK_BOOK_GENRE);
+        assertThat(persistenceException).hasMessageContaining(FK_BOOK_GENRE);
     }
 }

@@ -33,7 +33,7 @@ public class BookMapperImpl implements BookMapper {
         val book = new Book(dto.getId(), dto.getTitle(), authorMapper.toEntity(dto.getAuthor()),
                 genreMapper.toEntity(dto.getGenre()), null);
         if (comments != null) {
-            comments.stream().map(commentMapper::toEntity).forEach(book::addComment);
+            comments.stream().map(c -> commentMapper.toEntity(c, book)).forEach(book::addComment);
         }
         return book;
     }
@@ -72,7 +72,7 @@ public class BookMapperImpl implements BookMapper {
         Map<Long, CommentDto> toMerge = new HashMap<>();
         for (val commentDto : comments) {
             if (commentDto.getId() < 1) {
-                toAdd.add(commentMapper.toEntity(commentDto));
+                toAdd.add(commentMapper.toEntity(commentDto, book));
             } else {
                 toMerge.put(commentDto.getId(), commentDto);
             }

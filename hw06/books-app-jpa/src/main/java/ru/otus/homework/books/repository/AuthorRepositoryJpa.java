@@ -3,7 +3,7 @@ package ru.otus.homework.books.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import lombok.val;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.otus.homework.books.domain.Author;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Optional;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
-@Repository
+@Component
 public class AuthorRepositoryJpa implements AuthorRepository {
 
     private final EntityManager em;

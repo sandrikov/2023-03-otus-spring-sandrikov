@@ -1,6 +1,5 @@
 package ru.otus.homework.books.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -20,15 +19,10 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "authors")
 public class Author {
 
-    public static final int MAX_NAME_LENGTH = 128;
-
-    public static final String UK_AUTHOR_NAME = "UK_author_name";
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private long id;
 
-    @Column(nullable = false, unique = true, length = MAX_NAME_LENGTH)
     private String name;
 
     public Author(String name) {

@@ -2,7 +2,6 @@ package ru.otus.homework.books.repository;
 
 import ru.otus.homework.books.domain.Author;
 import ru.otus.homework.books.domain.Book;
-import ru.otus.homework.books.domain.Comment;
 import ru.otus.homework.books.domain.Genre;
 import ru.otus.homework.books.dto.BookProjection;
 
@@ -23,26 +22,18 @@ public interface BookRepository {
 
     List<Book> findAll();
 
-    List<BookProjection> findAllWithStat();
-
-    List<BookProjection> findAllWithStatByAuthorAndGenreTitle(Author author, Genre genre, String title);
+    List<Book> findAllByAuthorAndGenreAndTitle(Author author, Genre genre, String title);
 
     void deleteById(long id);
 
     void delete(Book book);
 
-    int deleteAllByAuthor(Author author);
+    int deleteAllInBatch(List<Book> booksToDelete);
 
-    int deleteAllByAuthorAndGenre(Author author, Genre genre);
+    int deleteAllInBatch();
 
-    int deleteAllByGenre(Genre genre);
+    List<BookProjection> findAllWithStat();
 
-    int deleteAll();
-
-    Optional<Comment> findCommentById(long id);
-
-    Comment saveComment(Book book, Comment comment);
-
-    void deleteComment(Book book, Comment comment);
+    List<BookProjection> findAllWithStatByAuthorAndGenreAndTitle(Author author, Genre genre, String title);
 
 }

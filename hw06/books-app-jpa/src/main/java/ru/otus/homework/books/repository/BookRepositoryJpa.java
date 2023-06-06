@@ -6,10 +6,9 @@ import jakarta.persistence.TypedQuery;
 import lombok.val;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.otus.homework.books.domain.Author;
 import ru.otus.homework.books.domain.Book;
-import ru.otus.homework.books.domain.Comment;
 import ru.otus.homework.books.domain.Genre;
 import ru.otus.homework.books.dto.BookProjection;
 import ru.otus.homework.books.mappers.BookProjectionMapper;
@@ -25,7 +24,7 @@ import static ru.otus.homework.books.repository.BookSpecifications.authorEquals;
 import static ru.otus.homework.books.repository.BookSpecifications.genreEquals;
 import static ru.otus.homework.books.repository.BookSpecifications.titleEquals;
 
-@Repository
+@Component
 public class BookRepositoryJpa implements BookRepository {
 
     private final BookProjectionMapper bookProjectionMapper;
@@ -62,7 +61,10 @@ public class BookRepositoryJpa implements BookRepository {
     public Optional<Book> findByTitleAndAuthor(String title, Author author) {
         val spec = Specification.where(titleEquals(title)).and(authorEquals(author));
         try {
-            val book = getQuery(spec).getSingleResult();
+            val entityGraph = em.getEntityGraph("book-author-genre-entity-graph");
+            val book = getQuery(spec)
+                    .setHint("jakarta.persistence.fetchgraph", entityGraph)
+                    .getSingleResult();
             return Optional.of(book);
         } catch (NoResultException e) {
             return empty();
@@ -71,12 +73,11 @@ public class BookRepositoryJpa implements BookRepository {
 
     @Override
     public List<Book> findAll() {
-        val entityGraph = em.getEntityGraph("book-author-genre-entity-graph");
-        return em.createQuery("select g from Book g", Book.class)
-                .setHint("jakarta.persistence.fetchgraph", entityGraph)
-                .getResultList();
+        val qls = "select b from Book b join fetch b.author join fetch b.genre";
+        return em.createQuery(qls, Book.class).getResultList();
     }
 
+    @Override
     public List<BookProjection> findAllWithStat() {
         val qls = """
                 select b, count(c)
@@ -91,20 +92,29 @@ public class BookRepositoryJpa implements BookRepository {
     }
 
     @Override
-    public List<BookProjection> findAllWithStatByAuthorAndGenreTitle(Author author, Genre genre, String title) {
-        val entityGraph = em.getEntityGraph("book-author-genre-entity-graph");
+    public List<BookProjection> findAllWithStatByAuthorAndGenreAndTitle(Author author, Genre genre, String title) {
         val spec = getSpecification(author, genre, title);
-        val query = getQuery(spec).setHint("jakarta.persistence.fetchgraph", entityGraph);
-
-        List<Book> books = query.getResultList();
+        val entityGraph = em.getEntityGraph("book-author-genre-entity-graph");
+        val books = getQuery(spec)
+                .setHint("jakarta.persistence.fetchgraph", entityGraph)
+                .getResultList();
 
         val qls = "select c.book.id, count(c) from Comment c group by c.book.id";
         val commentCounts = em.createQuery(qls, Object[].class).getResultList();
+
         Map<Long, Long> stat = commentCounts.stream().collect(Collectors.toMap(t -> (Long)t[0], t -> (Long)t[1]));
 
         return books.stream()
                 .map(b -> new Object[] {b, stat.getOrDefault(b.getId(), 0L)})
                 .map(bookProjectionMapper::toDto).toList();
+    }
+
+    public List<Book> findAllByAuthorAndGenreAndTitle(Author author, Genre genre, String title) {
+        val spec = getSpecification(author, genre, title);
+        val entityGraph = em.getEntityGraph("book-author-genre-entity-graph");
+        return getQuery(spec)
+                .setHint("jakarta.persistence.fetchgraph", entityGraph)
+                .getResultList();
     }
 
     @Override
@@ -121,23 +131,15 @@ public class BookRepositoryJpa implements BookRepository {
     }
 
     @Override
-    public int deleteAllByAuthor(Author author) {
-        return deleteAll(findAllByAuthorGenreTitle(author, null, null));
+    public int deleteAllInBatch(List<Book> booksToDelete) {
+        val query = em.createQuery("delete from Book b where b in (:books)");
+        query.setParameter("books", booksToDelete);
+        return query.executeUpdate();
     }
 
     @Override
-    public int deleteAllByAuthorAndGenre(Author author, Genre genre) {
-        return deleteAll(findAllByAuthorGenreTitle(author, genre, null));
-    }
-
-    @Override
-    public int deleteAllByGenre(Genre genre) {
-        return deleteAll(findAllByAuthorGenreTitle(null, genre, null));
-    }
-
-    @Override
-    public int deleteAll() {
-        return deleteAll(findAll());
+    public int deleteAllInBatch() {
+        return em.createQuery("delete from Book").executeUpdate();
     }
 
     @Override
@@ -154,42 +156,11 @@ public class BookRepositoryJpa implements BookRepository {
         return em.createQuery(cq).getSingleResult();
     }
 
-    @Override
-    public Optional<Comment> findCommentById(long id) {
-        return ofNullable(em.find(Comment.class, id));
-    }
-
-    @Override
-    public Comment saveComment(Book book, Comment comment) {
-        if (comment.getId() <= 0) {
-            book.addComment(comment);
-            em.persist(comment);
-            return comment;
-        } else {
-            return em.merge(comment);
-        }
-    }
-
-    @Override
-    public void deleteComment(Book book, Comment comment) {
-        val existingComment = em.find(Comment.class, comment.getId());
-        if (existingComment != null) {
-            book.removeComment(comment);
-            em.remove(em.contains(comment) ? comment : em.merge(comment));
-        }
-    }
-
     private static Specification<Book> getSpecification(Author author, Genre genre, String title) {
         return Specification.where(titleEquals(title))
                 .and(genreEquals(genre))
                 .and(authorEquals(author));
     }
-
-    private List<Book> findAllByAuthorGenreTitle(Author author, Genre genre, String title) {
-        val spec = getSpecification(author, genre, title);
-        return getQuery(spec).getResultList();
-    }
-
 
     private TypedQuery<Book> getQuery(Specification<Book> spec) {
         val builder = em.getCriteriaBuilder();
@@ -197,11 +168,6 @@ public class BookRepositoryJpa implements BookRepository {
         val root = criteriaQuery.from(Book.class);
         val predicate = spec.toPredicate(root, criteriaQuery, builder);
         return em.createQuery(criteriaQuery.where(predicate).select(root));
-    }
-
-    private int deleteAll(List<Book> booksToDelete) {
-        booksToDelete.forEach(em::remove);
-        return booksToDelete.size();
     }
 
 }

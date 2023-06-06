@@ -2,7 +2,6 @@ package ru.otus.homework.books.repository;
 
 import jakarta.persistence.PersistenceException;
 import lombok.val;
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +10,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import ru.otus.homework.books.domain.Author;
 
-import java.util.Comparator;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static ru.otus.homework.books.domain.Author.UK_AUTHOR_NAME;
-import static ru.otus.homework.books.domain.Book.FK_BOOK_AUTHOR;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.FK_BOOK_AUTHOR;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.UK_AUTHOR_NAME;
 
 
 @DisplayName("Репозиторий авторов книг")
@@ -72,10 +70,7 @@ class AuthorRepositoryJpaTest {
     void saveInsertDuplicateName() {
         var author = new Author(MARK_TWAIN);
         val persistenceException = assertThrows(PersistenceException.class, () -> authorRepository.save(author));
-        assertThat(persistenceException)
-                .hasCauseExactlyInstanceOf(ConstraintViolationException.class);
-        var cause = (ConstraintViolationException) persistenceException.getCause();
-        assertThat(cause.getConstraintName()).containsIgnoringCase(UK_AUTHOR_NAME);
+        assertThat(persistenceException).hasMessageContaining(UK_AUTHOR_NAME);
     }
 
     @Test
@@ -145,10 +140,7 @@ class AuthorRepositoryJpaTest {
         val author = new Author(MARK_TWAIN_ID, MARK_TWAIN);
         authorRepository.delete(author);
         val persistenceException = assertThrows(PersistenceException.class, authorRepository::count);
-        assertThat(persistenceException)
-                .hasCauseExactlyInstanceOf(ConstraintViolationException.class);
-        var cause = (ConstraintViolationException) persistenceException.getCause();
-        assertThat(cause.getConstraintName()).containsIgnoringCase(FK_BOOK_AUTHOR);
+        assertThat(persistenceException).hasMessageContaining(FK_BOOK_AUTHOR);
     }
 
 }

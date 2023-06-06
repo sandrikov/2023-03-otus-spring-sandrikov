@@ -1,17 +1,18 @@
 package ru.otus.homework.books.mappers;
 
 import org.springframework.stereotype.Component;
+import ru.otus.homework.books.domain.Book;
 import ru.otus.homework.books.domain.Comment;
 import ru.otus.homework.books.dto.CommentDto;
 
 @Component
 public class CommentMapperImpl implements CommentMapper {
     @Override
-    public Comment toEntity(CommentDto dto) {
+    public Comment toEntity(CommentDto dto, Book book) {
         if (dto == null) {
             return null;
         }
-        return new Comment(dto.getId(), dto.getText(), null);
+        return new Comment(dto.getId(), dto.getText(), book);
     }
 
     @Override
@@ -27,7 +28,7 @@ public class CommentMapperImpl implements CommentMapper {
         if (dto == null) {
             return;
         }
-        if (dto.getText() != null && !dto.getText().equals(comment.getText())) {
+        if (dto.getText() != null) {
             comment.setText(dto.getText());
         }
     }

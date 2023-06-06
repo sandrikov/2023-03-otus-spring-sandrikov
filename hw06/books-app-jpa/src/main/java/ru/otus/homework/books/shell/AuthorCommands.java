@@ -10,7 +10,7 @@ import ru.otus.homework.books.dto.AuthorDto;
 import ru.otus.homework.books.services.AuthorService;
 
 import static java.util.Comparator.comparing;
-import static ru.otus.homework.books.domain.Author.MAX_NAME_LENGTH;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.MAX_NAME_LENGTH;
 import static ru.otus.homework.books.services.ServiceResponse.Status.ERROR;
 
 @ShellComponent
