@@ -6,7 +6,6 @@ import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-import ru.otus.homework.books.dto.BookDto;
 import ru.otus.homework.books.dto.BookProjection;
 import ru.otus.homework.books.services.BookService;
 
@@ -64,7 +63,7 @@ public class BooksCommands {
 
     @ShellMethod(value = "Get book by ID", key = {"get book", "gb"})
     public String getBook(@ShellOption(value = {"-I", "--id"}) Long id) {
-        var response = bookService.getBook(id);
+        var response = bookService.getBookProjection(id);
         if (response.getStatus() == ERROR) {
             return shellHelper.getErrorMessage(response.getMessage());
         }
@@ -121,12 +120,12 @@ public class BooksCommands {
         return count == 0 ? shellHelper.getWarningMessage(message) : shellHelper.getSuccessMessage(message);
     }
 
-    private String format(BookDto book) {
+    private String format(BookProjection book) {
         return shellHelper.getInfoMessage(String.format("%s \"%s\", %s, id=%d",
-                book.getAuthor().getName(), book.getTitle(), book.getGenre().getName(), book.getId()));
+                book.author().getName(), book.title(), book.title(), book.id()));
     }
 
-    private String printSuccess(BookDto book, String report) {
+    private String printSuccess(BookProjection book, String report) {
         return new TextStringBuilder().append(format(book)).appendNewLine()
                 .append(shellHelper.getSuccessMessage(report)).toString();
     }

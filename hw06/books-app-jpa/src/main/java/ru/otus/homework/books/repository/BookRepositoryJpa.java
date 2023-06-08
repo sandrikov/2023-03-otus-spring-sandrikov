@@ -11,7 +11,7 @@ import ru.otus.homework.books.domain.Author;
 import ru.otus.homework.books.domain.Book;
 import ru.otus.homework.books.domain.Genre;
 import ru.otus.homework.books.dto.BookProjection;
-import ru.otus.homework.books.mappers.BookProjectionMapper;
+import ru.otus.homework.books.mappers.BookMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -27,12 +27,12 @@ import static ru.otus.homework.books.repository.BookSpecifications.titleEquals;
 @Component
 public class BookRepositoryJpa implements BookRepository {
 
-    private final BookProjectionMapper bookProjectionMapper;
+    private final BookMapper bookMapper;
 
     private final EntityManager em;
 
-    public BookRepositoryJpa(EntityManager em, @Lazy BookProjectionMapper bookProjectionMapper) {
-        this.bookProjectionMapper = bookProjectionMapper;
+    public BookRepositoryJpa(EntityManager em, @Lazy BookMapper bookMapper) {
+        this.bookMapper = bookMapper;
         this.em = em;
     }
 
@@ -88,7 +88,7 @@ public class BookRepositoryJpa implements BookRepository {
                   group by b
                 """;
         val query = em.createQuery(qls, Object[].class);
-        return query.getResultList().stream().map(bookProjectionMapper::toDto).toList();
+        return query.getResultList().stream().map(bookMapper::toBookProjection).toList();
     }
 
     @Override
@@ -106,7 +106,7 @@ public class BookRepositoryJpa implements BookRepository {
 
         return books.stream()
                 .map(b -> new Object[] {b, stat.getOrDefault(b.getId(), 0L)})
-                .map(bookProjectionMapper::toDto).toList();
+                .map(bookMapper::toBookProjection).toList();
     }
 
     public List<Book> findAllByAuthorAndGenreAndTitle(Author author, Genre genre, String title) {

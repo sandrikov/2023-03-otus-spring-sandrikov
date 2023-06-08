@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import ru.otus.homework.books.dto.AuthorDto;
+import ru.otus.homework.books.dto.BookProjection;
 import ru.otus.homework.books.dto.GenreDto;
 import ru.otus.homework.books.mappers.AuthorMapperImpl;
 import ru.otus.homework.books.mappers.BookMapperImpl;
-import ru.otus.homework.books.mappers.BookProjectionMapperImpl;
 import ru.otus.homework.books.mappers.CommentMapperImpl;
 import ru.otus.homework.books.mappers.GenreMapperImpl;
 import ru.otus.homework.books.repository.AuthorRepositoryJpa;
@@ -47,7 +47,7 @@ import static ru.otus.homework.books.services.ServiceResponse.Status.OK;
 @Import({AuthorServiceImpl.class, GenreServiceImpl.class, BookServiceImpl.class,
         BookRepositoryJpa.class, AuthorRepositoryJpa.class, GenreRepositoryJpa.class, CommentRepositoryJpa.class,
         GenreMapperImpl.class, AuthorMapperImpl.class, CommentMapperImpl.class,
-        BookProjectionMapperImpl.class, BookMapperImpl.class})
+        BookMapperImpl.class})
 class BookServiceTest {
 
     @Autowired
@@ -73,12 +73,12 @@ class BookServiceTest {
     @DisplayName("Поиск книги по ID: позитивный и негативный сценарии")
     @Test
     void getBook() {
-        var book = assertOK(bookService.getBook(TWAIN_D_ARK_BOOK_ID));
-        assertEquals(JEANNE_D_ARC, book.getTitle(), "Book name");
-        assertEquals(MARK_TWAIN, book.getAuthor().getName(), "Author name");
-        assertEquals(HISTORICAL_FICTION, book.getGenre().getName(), "Genre name");
+        BookProjection book = assertOK(bookService.getBookProjection(TWAIN_D_ARK_BOOK_ID));
+        assertEquals(JEANNE_D_ARC, book.title(), "Book title");
+        assertEquals(MARK_TWAIN, book.author().getName(), "Author name");
+        assertEquals(HISTORICAL_FICTION, book.genre().getName(), "Genre name");
         // negative
-        assertError(bookService.getBook(99L), BOOK_NOT_FOUND, "id=99");
+        assertError(bookService.getBookProjection(99L), BOOK_NOT_FOUND, "id=99");
     }
 
     @DisplayName("Добавить книгу")
@@ -88,13 +88,13 @@ class BookServiceTest {
         var genre = getGenre(HISTORICAL_FICTION);
         var name = THREE_MUSKETEERS;
         var newBook = assertOK(bookService.createBook(name, author.getId(), genre.getId()));
-        var book = assertOK(bookService.getBook(newBook.getId()));
+        var book = assertOK(bookService.getBookProjection(newBook.id()));
         assertThat(book).isNotNull()
-                .matches(s -> s.getAuthor() != null, "Author is presented")
-                .matches(s -> s.getGenre() != null, "Genre is presented");
-        assertEquals(name, book.getTitle(), "Book name");
-        assertEquals(author, book.getAuthor(), "Author");
-        assertEquals(genre, book.getGenre(), "Genre");
+                .matches(s -> s.author() != null, "Author is presented")
+                .matches(s -> s.genre() != null, "Genre is presented");
+        assertEquals(name, book.title(), "Book title");
+        assertEquals(author, book.author(), "Author");
+        assertEquals(genre, book.genre(), "Genre");
     }
 
     @DisplayName("Добавить книгу. Ошибка: Две одноимённые книги одного автора")
@@ -113,10 +113,10 @@ class BookServiceTest {
         var genre = getGenre(DETECTIVE);
         var bookName = "Смерть на Ниле";
         assertOK(bookService.modifyBook(TWAIN_D_ARK_BOOK_ID, bookName, author.getId(), genre.getId()));
-        var book = assertOK(bookService.getBook(TWAIN_D_ARK_BOOK_ID));
-        assertEquals(bookName, book.getTitle(), "Book name");
-        assertEquals(author, book.getAuthor(), "Author");
-        assertEquals(genre, book.getGenre(), "Genre");
+        var book = assertOK(bookService.getBookProjection(TWAIN_D_ARK_BOOK_ID));
+        assertEquals(bookName, book.title(), "Book title");
+        assertEquals(author, book.author(), "Author");
+        assertEquals(genre, book.genre(), "Genre");
     }
 
     @DisplayName("Изменить книгу. Ошибка: Две одноимённые книги одного автора")
@@ -130,7 +130,7 @@ class BookServiceTest {
     @Test
     void deleteBook() {
         assertOK(bookService.deleteBook(TWAIN_D_ARK_BOOK_ID));
-        assertError(bookService.getBook(TWAIN_D_ARK_BOOK_ID), BOOK_NOT_FOUND, "id=" + TWAIN_D_ARK_BOOK_ID);
+        assertError(bookService.getBookProjection(TWAIN_D_ARK_BOOK_ID), BOOK_NOT_FOUND, "id=" + TWAIN_D_ARK_BOOK_ID);
         // negative
         assertError(bookService.deleteBook(99L), BOOK_NOT_FOUND, "id=99");
     }

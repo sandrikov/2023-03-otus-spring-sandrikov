@@ -80,4 +80,9 @@ public class Book {
         comment.setBook(null);
     }
 
+    public void removeAllComments() {
+        if (comments != null) {
+            comments.clear();
+        }
+    }
 }

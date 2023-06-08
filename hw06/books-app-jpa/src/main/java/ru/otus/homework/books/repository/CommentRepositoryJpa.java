@@ -37,6 +37,13 @@ public class CommentRepositoryJpa implements CommentRepository {
     }
 
     @Override
+    public long countByBook(Book book) {
+        val query = em.createQuery("select count(c) from Comment c where c.book = (:book)", Long.class);
+        query.setParameter("book", book);
+        return query.getSingleResult();
+    }
+
+    @Override
     public void delete(Comment comment) {
         val existingComment = em.find(Comment.class, comment.getId());
         if (existingComment != null) {
@@ -45,10 +52,10 @@ public class CommentRepositoryJpa implements CommentRepository {
     }
 
     @Override
-    public void deleteAllByBooksInBatch(List<Book> books) {
+    public int deleteAllByBooksInBatch(List<Book> books) {
         val query = em.createQuery("delete from Comment c where c.book in (:books)");
         query.setParameter("books", books);
-        query.executeUpdate();
+        return query.executeUpdate();
     }
 
     @Override

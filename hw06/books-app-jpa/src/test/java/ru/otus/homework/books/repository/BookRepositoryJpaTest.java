@@ -13,9 +13,11 @@ import ru.otus.homework.books.domain.Comment;
 import ru.otus.homework.books.domain.Genre;
 import ru.otus.homework.books.dto.BookProjection;
 import ru.otus.homework.books.mappers.AuthorMapperImpl;
-import ru.otus.homework.books.mappers.BookProjectionMapperImpl;
+import ru.otus.homework.books.mappers.BookMapperImpl;
 import ru.otus.homework.books.mappers.CommentMapperImpl;
 import ru.otus.homework.books.mappers.GenreMapperImpl;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +34,7 @@ import static ru.otus.homework.books.repository.GenreRepositoryJpaTest.UNUSED_GE
 @DisplayName("Репозиторий для работы с книгами")
 @DataJpaTest
 @Import({BookRepositoryJpa.class, AuthorRepositoryJpa.class, GenreRepositoryJpa.class, CommentRepositoryJpa.class,
-        GenreMapperImpl.class, AuthorMapperImpl.class, CommentMapperImpl.class, BookProjectionMapperImpl.class})
+        GenreMapperImpl.class, AuthorMapperImpl.class, CommentMapperImpl.class, BookMapperImpl.class})
 public class BookRepositoryJpaTest {
 
     public static final int NUMBER_OF_BOOKS = 8;
@@ -105,7 +107,7 @@ public class BookRepositoryJpaTest {
         assertEquals(HISTORICAL_FICTION, book.get().getGenre().getName(), "Genre name");
     }
 
-    @DisplayName("Каскадное удаление комментариев. Lazy данные не загружены. Авторы и жанры не удалены")
+    @DisplayName("Каскадное удаление комментариев. Lazy данные не загружены")
     @Test
     void deleteById() {
         bookRepository.deleteById(TWAIN_D_ARK_BOOK_ID);
@@ -122,7 +124,7 @@ public class BookRepositoryJpaTest {
         assertThat(genreById).isNotNull();
     }
 
-    @DisplayName("Каскадное удаление комментариев. Lazy данные в контексте. Авторы и жанры не удалены")
+    @DisplayName("Каскадное удаление комментариев при удалении книги. Lazy данные в контексте")
     @Test
     void delete() {
         val optionalBook = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
@@ -234,6 +236,31 @@ public class BookRepositoryJpaTest {
         int deleted = bookRepository.deleteAllInBatch(books);
         assertEquals(NUMBER_OF_TWAIN_BOOKS, deleted, "Number of deleted books");
         assertEquals(NUMBER_OF_BOOKS - NUMBER_OF_TWAIN_BOOKS, bookRepository.count(), "Number of rest books");
+    }
+
+    @DisplayName("Пакетное удаление только что созданной книги")
+    @Test
+    void deleteAllInBatchAfterCreate() {
+        // create book with two
+        val author = em.find(Author.class, UNUSED_AUTHOR_ID);
+        val genre = em.find(Genre.class, UNUSED_GENRE_ID);
+        val bookToSave = new Book("Title of book", author, genre);
+        bookToSave.addComment("Comment #1");
+        bookToSave.addComment("Comment #2");
+        val savedBook = bookRepository.save(bookToSave);
+        val bookId = savedBook.getId();
+        val commentIds = savedBook.getComments().stream().map(Comment::getId).toList();
+        assertThat(bookRepository.findById(bookId)).isPresent();
+        // delete by IDs in batch
+        val books = List.of(savedBook);
+        int deletedComments = commentRepository.deleteAllByBooksInBatch(books);
+        assertEquals(commentIds.size(), deletedComments, "Number of deleted comments");
+        int deletedBooks = bookRepository.deleteAllInBatch(books);
+        assertEquals(1, deletedBooks, "Number of deleted books");
+        em.flush();
+        // check
+        long countByBook = commentRepository.countByBook(savedBook);
+        assertEquals(0, commentRepository.countByBook(savedBook), "Not found");
     }
 
     @DisplayName("Посчитать книги о разным критериям")

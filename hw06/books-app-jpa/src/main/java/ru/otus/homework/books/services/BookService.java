@@ -11,11 +11,13 @@ public interface BookService {
 
     ServiceResponse<BookDto> getBook(Long id);
 
-    ServiceResponse<BookDto> createBook(String name, Long authorId, Long genreId);
+    ServiceResponse<BookProjection> getBookProjection(Long id);
 
-    ServiceResponse<BookDto> modifyBook(Long id, String name, Long authorId, Long genreId);
+    ServiceResponse<BookProjection> createBook(String name, Long authorId, Long genreId);
 
-    ServiceResponse<BookDto> deleteBook(long id);
+    ServiceResponse<BookProjection> modifyBook(Long id, String name, Long authorId, Long genreId);
+
+    ServiceResponse<BookProjection> deleteBook(long id);
 
     ServiceResponse<Integer> deleteBooks(Long authorId, Long genreId);
 

@@ -1,5 +1,6 @@
 package ru.otus.homework.books.services;
 
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +24,13 @@ import static ru.otus.homework.books.services.GenreServiceImpl.GENRE_NOT_FOUND;
 import static ru.otus.homework.books.services.ServiceResponse.done;
 import static ru.otus.homework.books.services.ServiceResponse.error;
 
+@RequiredArgsConstructor
 @Service
 public class BookServiceImpl implements BookService {
 
     public static final String BOOK_NOT_FOUND = "Book is not found: %s";
 
     public static final String BOOK_ALREADY_EXISTS = "Book already exists: %s '%s'";
-
 
     private final BookRepository bookRepository;
 
@@ -40,18 +41,6 @@ public class BookServiceImpl implements BookService {
     private final CommentRepository commentRepository;
 
     private final BookMapper bookMapper;
-
-
-
-    public BookServiceImpl(BookRepository bookbookRepository, AuthorRepository authorRepository,
-                           GenreRepository genreRepository, CommentRepository commentRepository,
-                           BookMapper bookMapper) {
-        this.bookRepository = bookbookRepository;
-        this.authorRepository = authorRepository;
-        this.genreRepository = genreRepository;
-        this.commentRepository = commentRepository;
-        this.bookMapper = bookMapper;
-    }
 
     @Transactional(readOnly = true)
     @Override
@@ -73,9 +62,19 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public ServiceResponse<BookProjection> getBookProjection(Long id) {
+        try {
+            return done(toBookProjection(findBook(id)));
+        } catch (EntityNotFoundException e) {
+            return error(e.getMessage());
+        }
+    }
+
     @Transactional
     @Override
-    public ServiceResponse<BookDto> createBook(String title, Long authorId, Long genreId) {
+    public ServiceResponse<BookProjection> createBook(String title, Long authorId, Long genreId) {
         Author author;
         Genre genre;
         try {
@@ -89,12 +88,12 @@ public class BookServiceImpl implements BookService {
         }
         var book = new Book(title, author, genre);
         bookRepository.save(book);
-        return done(bookMapper.toDto(book));
+        return done(bookMapper.toBookProjection(book, 0L));
     }
 
     @Transactional
     @Override
-    public ServiceResponse<BookDto> modifyBook(Long id, String title, Long authorId, Long genreId) {
+    public ServiceResponse<BookProjection> modifyBook(Long id, String title, Long authorId, Long genreId) {
         try {
             val author = findAuthor(authorId);
             val genre = findGenre(genreId);
@@ -109,7 +108,7 @@ public class BookServiceImpl implements BookService {
             }
             partialUpdate(book, title, genreId, author, genre);
             bookRepository.save(book);
-            return done(bookMapper.toDto(book));
+            return done(toBookProjection(book));
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
         }
@@ -117,11 +116,11 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public ServiceResponse<BookDto> deleteBook(long id) {
+    public ServiceResponse<BookProjection> deleteBook(long id) {
         try {
             var book = findBook(id);
             bookRepository.delete(book);
-            return done(bookMapper.toDto(book));
+            return done(bookMapper.toBookProjection(book, 0L));
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
         }
@@ -181,4 +180,8 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    private BookProjection toBookProjection(Book book) {
+        long commentCount = commentRepository.countByBook(book);
+        return bookMapper.toBookProjection(book, commentCount);
+    }
 }

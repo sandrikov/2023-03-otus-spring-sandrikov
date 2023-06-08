@@ -1,7 +1,6 @@
 package ru.otus.homework.books.services;
 
 import lombok.val;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.homework.books.domain.Author;
@@ -43,14 +42,12 @@ public class AuthorServiceImpl implements AuthorService {
         this.authorMapper = authorMapper;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public ServiceResponse<List<AuthorDto>> listAuthors() {
         val authors = authorRepository.findAll().stream().map(authorMapper::toDto).toList();
         return done(authors);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public  ServiceResponse<AuthorDto> getAuthor(long id) {
         try {
@@ -60,7 +57,6 @@ public class AuthorServiceImpl implements AuthorService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public ServiceResponse<AuthorDto> findAuthor(String name) {
         return authorRepository.findByName(name)
@@ -75,12 +71,8 @@ public class AuthorServiceImpl implements AuthorService {
             return error(String.format(AUTHOR_ALREADY_EXISTS, name));
         }
         var author = new Author(name);
-        try {
-            authorRepository.save(author);
-            return done(authorMapper.toDto(author));
-        } catch (DuplicateKeyException e) {
-            return error(String.format(AUTHOR_ALREADY_EXISTS, name));
-        }
+        authorRepository.save(author);
+        return done(authorMapper.toDto(author));
     }
 
     @Transactional
@@ -92,13 +84,12 @@ public class AuthorServiceImpl implements AuthorService {
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
         }
-        if (!Objects.equals(name, author.getName())) {
-            if (authorRepository.findByName(name).isPresent()) {
-                return error(String.format(AUTHOR_ALREADY_EXISTS, name));
-            }
-            author.setName(name);
-            authorRepository.save(author);
+        if (!Objects.equals(name, author.getName()) &&
+                authorRepository.findByName(name).isPresent()) {
+            return error(String.format(AUTHOR_ALREADY_EXISTS, name));
         }
+        author.setName(name);
+        authorRepository.save(author);
         return done(authorMapper.toDto(author));
     }
 

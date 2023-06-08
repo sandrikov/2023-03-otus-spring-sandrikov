@@ -11,9 +11,11 @@ public interface CommentRepository {
 
     Optional<Comment> findById(long id);
 
+    long countByBook(Book book);
+
     void delete(Comment comment);
 
-    void deleteAllByBooksInBatch(List<Book> book);
+    int deleteAllByBooksInBatch(List<Book> book);
 
     void deleteAllInBatch();
 

@@ -20,7 +20,7 @@ import static ru.otus.homework.books.repository.BookRepositoryJpaTest.TWAIN_D_AR
 import static ru.otus.homework.books.repository.BookRepositoryJpaTest.TWAIN_D_ARK_BOOK_ID;
 
 
-@DisplayName("Репозиторий для работы с книгами")
+@DisplayName("Репозиторий для работы с комментариями")
 @DataJpaTest
 @Import({CommentRepositoryJpa.class, CommentMapperImpl.class, BookRepositoryJpa.class})
 class CommentRepositoryJpaTest {
