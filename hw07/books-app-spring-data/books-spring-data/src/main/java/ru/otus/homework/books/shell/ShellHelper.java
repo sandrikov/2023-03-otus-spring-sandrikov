@@ -104,7 +104,7 @@ public class ShellHelper {
     }
 
     public <T> String createTable(Collection<T> list, Comparator<T> comparator,
-                               Function<T, Object[]> mapper, String... headerRow) {
+                                  Function<T, Object[]> mapper, String... headerRow) {
         List<Object[]> data = new ArrayList<>();
         data.add(headerRow);
         list.stream().sorted(comparator).map(mapper).forEach(data::add);

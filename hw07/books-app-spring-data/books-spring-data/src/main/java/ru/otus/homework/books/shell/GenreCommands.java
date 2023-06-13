@@ -46,7 +46,7 @@ public class GenreCommands {
             return shellHelper.getWarningMessage(report);
         }
         var table = shellHelper.createTable(genres, comparing(GenreDto::getName),
-                a -> new Object[] { a.getName(), a.getId() }, TABLE_HEADER_ROW);
+                a -> new Object[]{a.getName(), a.getId()}, TABLE_HEADER_ROW);
         return table.concat(shellHelper.getSuccessMessage(report));
     }
 
@@ -61,7 +61,7 @@ public class GenreCommands {
 
     @ShellMethod(value = "Find genre by name", key = {"find genre", "fg"})
     public String findGenre(@ShellOption(value = {"-N", "--name"})
-                             @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH) String name) {
+                            @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH) String name) {
         var response = genreService.findGenre(name);
         if (response.getStatus() == ERROR) {
             return shellHelper.getErrorMessage(response.getMessage());
@@ -71,7 +71,7 @@ public class GenreCommands {
 
     @ShellMethod(value = "Add genre", key = {"add genre", "ag"})
     public String createGenre(@ShellOption(value = {"-N", "--name"})
-                               @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH) String name) {
+                              @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH) String name) {
         var response = genreService.createGenre(name);
         if (response.getStatus() == ERROR) {
             return shellHelper.getErrorMessage(response.getMessage());
@@ -81,8 +81,8 @@ public class GenreCommands {
 
     @ShellMethod(value = "Rename genre", key = {"rename genre", "rg"})
     public String renameGenre(@ShellOption(value = {"-I", "--id"}) Long id,
-                               @ShellOption(value = {"-N", "--name"})
-                               @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH) String name) {
+                              @ShellOption(value = {"-N", "--name"})
+                              @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH) String name) {
         var response = genreService.renameGenre(id, name);
         if (response.getStatus() == ERROR) {
             return shellHelper.getErrorMessage(response.getMessage());

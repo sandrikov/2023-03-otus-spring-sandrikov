@@ -1,18 +1,20 @@
 package ru.otus.homework.books.services;
 
 import lombok.val;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.homework.books.domain.Book;
 import ru.otus.homework.books.domain.Comment;
 import ru.otus.homework.books.dto.CommentDto;
 import ru.otus.homework.books.mappers.CommentMapper;
-import ru.otus.homework.books.repository.BookRepository;
 import ru.otus.homework.books.repository.CommentRepository;
 import ru.otus.homework.books.services.misc.EntityNotFoundException;
 import ru.otus.homework.books.services.misc.ServiceUtils;
 
-import static ru.otus.homework.books.services.BookServiceImpl.BOOK_NOT_FOUND;
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static ru.otus.homework.books.services.ServiceResponse.done;
 import static ru.otus.homework.books.services.ServiceResponse.error;
 
@@ -23,14 +25,14 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    private final BookRepository bookRepository;
+    private final BookService bookService;
 
     private final CommentMapper commentMapper;
 
-    public CommentServiceImpl(CommentRepository commentRepository, BookRepository bookRepository,
-                              CommentMapper commentMapper) {
+    public CommentServiceImpl(CommentRepository commentRepository, CommentMapper commentMapper,
+                              @Lazy BookService bookService) {
         this.commentRepository = commentRepository;
-        this.bookRepository = bookRepository;
+        this.bookService = bookService;
         this.commentMapper = commentMapper;
     }
 
@@ -39,7 +41,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public ServiceResponse<CommentDto> addComment(long bookId, CommentDto commentDto) {
         try {
-            val book = findBook(bookId);
+            val book = bookService.findBook(bookId);
             var comment = commentMapper.toEntity(commentDto, book);
             book.addComment(comment);
             comment = commentRepository.save(comment);
@@ -75,12 +77,25 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    private Comment findComment(Long commentId) throws EntityNotFoundException {
-        return ServiceUtils.findById(commentId, commentRepository::findById, COMMENT_NOT_FOUND);
+    @Override
+    public void deleteComments(Collection<Long> bookIds) {
+        val commentsToDelete = commentRepository.findAllByBookIdIn(bookIds);
+        commentRepository.deleteAllInBatch(commentsToDelete);
     }
 
-    private Book findBook(Long bookId) throws EntityNotFoundException {
-        return ServiceUtils.findById(bookId, bookRepository::findById, BOOK_NOT_FOUND);
+    @Override
+    public long countByBookId(Long bookId) {
+        return commentRepository.countByBookId(bookId);
+    }
+
+    @Override
+    public Map<Long, Long> countGroupByBookId(Collection<Long> bookIds) {
+        return commentRepository.countGroupByBookId(bookIds)
+                .collect(Collectors.toMap(t -> (Long) t[0], t -> (Long) t[1]));
+    }
+
+    private Comment findComment(Long commentId) throws EntityNotFoundException {
+        return ServiceUtils.findById(commentId, commentRepository::findById, COMMENT_NOT_FOUND);
     }
 
 }

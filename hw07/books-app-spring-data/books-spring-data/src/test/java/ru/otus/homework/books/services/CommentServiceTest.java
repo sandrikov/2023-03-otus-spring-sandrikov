@@ -20,6 +20,7 @@ import ru.otus.homework.books.repository.AuthorRepository;
 import ru.otus.homework.books.repository.BookRepository;
 import ru.otus.homework.books.repository.CommentRepository;
 import ru.otus.homework.books.repository.GenreRepository;
+import ru.otus.homework.books.services.misc.EntityNotFoundException;
 
 import java.util.Optional;
 
@@ -39,7 +40,7 @@ import static ru.otus.homework.books.services.ServiceResponse.Status.OK;
 class CommentServiceTest {
 
     @MockBean
-    BookRepository bookRepository;
+    BookService bookService;
     @MockBean
     CommentRepository commentRepository;
     @Autowired
@@ -49,14 +50,14 @@ class CommentServiceTest {
 
     @DisplayName("Добавить комментарий к существующий книге")
     @Test
-    void addComment() {
+    void addComment() throws Exception {
         val textOfComment = "Text of new comment";
         // Entity
         val book = createBook();
         val comment = new Comment(1L, textOfComment, null);
         book.addComment(comment);
         // Mock
-        given(bookRepository.findById(book.getId())).willReturn(Optional.of(book));
+        given(bookService.findBook(book.getId())).willReturn(book);
         given(commentRepository.save(any(Comment.class))).willReturn(comment);
         // Check
         val response = commentService.addComment(book.getId(), new CommentDto(textOfComment));
@@ -70,7 +71,7 @@ class CommentServiceTest {
 
     @DisplayName("Добавить комментарий к несуществующий книге")
     @Test
-    void addCommentNotFoundException() {
+    void addCommentNotFoundException() throws Exception {
         val textOfComment = "Does not matter";
         // Entity
         val book = createBook();
@@ -79,6 +80,7 @@ class CommentServiceTest {
         // Mock
         given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
         given(commentRepository.save(any(Comment.class))).willReturn(comment);
+        given(bookService.findBook(book.getId())).willThrow(new EntityNotFoundException(String.format(BOOK_NOT_FOUND, "id=" + book.getId())));
         // Check
         val response = commentService.addComment(book.getId(), new CommentDto(textOfComment));
         assertThat(response).isNotNull()

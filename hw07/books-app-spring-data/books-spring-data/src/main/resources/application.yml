@@ -14,7 +14,7 @@ spring:
     show-sql: false
 
   application:
-    name: Books app JPA version
+    name: Books app Spring Data JPA version
 
   shell:
     command:
@@ -31,7 +31,7 @@ spring:
     show-sql: false
 
 application:
-  name: books-app-jpa
+  name: books-app-spring-data
 
 h2:
   console:

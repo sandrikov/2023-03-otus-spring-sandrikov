@@ -1,4 +1,5 @@
 package ru.otus.homework.books.services;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,6 @@ import ru.otus.homework.books.mappers.AuthorMapperImpl;
 import ru.otus.homework.books.mappers.BookMapperImpl;
 import ru.otus.homework.books.mappers.CommentMapperImpl;
 import ru.otus.homework.books.mappers.GenreMapperImpl;
-import ru.otus.homework.books.repository.AuthorRepository;
-import ru.otus.homework.books.repository.BookRepository;
-import ru.otus.homework.books.repository.CommentRepository;
-import ru.otus.homework.books.repository.GenreRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,8 +40,7 @@ import static ru.otus.homework.books.services.ServiceResponse.Status.OK;
 
 @DisplayName("API для работы с книгами. Интеграционный тест")
 @DataJpaTest
-@Import({AuthorServiceImpl.class, GenreServiceImpl.class, BookServiceImpl.class,
-        BookRepository.class, AuthorRepository.class, GenreRepository.class, CommentRepository.class,
+@Import({AuthorServiceImpl.class, GenreServiceImpl.class, BookServiceImpl.class, CommentServiceImpl.class,
         GenreMapperImpl.class, AuthorMapperImpl.class, CommentMapperImpl.class,
         BookMapperImpl.class})
 class BookServiceTest {

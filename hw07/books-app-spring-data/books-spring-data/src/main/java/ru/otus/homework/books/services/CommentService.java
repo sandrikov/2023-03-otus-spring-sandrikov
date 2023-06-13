@@ -2,6 +2,9 @@ package ru.otus.homework.books.services;
 
 import ru.otus.homework.books.dto.CommentDto;
 
+import java.util.Collection;
+import java.util.Map;
+
 public interface CommentService {
 
     ServiceResponse<CommentDto> addComment(long bookId, CommentDto comment);
@@ -10,4 +13,9 @@ public interface CommentService {
 
     ServiceResponse<CommentDto> deleteComment(long commentId);
 
+    void deleteComments(Collection<Long> bookIds);
+
+    long countByBookId(Long bookId);
+
+    Map<Long, Long> countGroupByBookId(Collection<Long> bookIds);
 }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import ru.otus.homework.books.domain.Author;
@@ -27,12 +26,8 @@ public class AuthorRepositoryTest {
     public static final String ALEXANDR_DUMAS = "Александр Дюма";
     public static final String MARK_TWAIN = "Марк Твен";
     public static final String LEO_TOLSTOY = "Лев Толстой";
-    public static final int NUMBER_OF_AUTHORS = 4;
     public static final long UNUSED_AUTHOR_ID = 3;
     public static final long MARK_TWAIN_ID = 1;
-
-    @Autowired
-    private TestEntityManager em;
 
     @Autowired
     private AuthorRepository authorRepository;

@@ -24,7 +24,7 @@ import static ru.otus.homework.books.repository.BookRepositoryTest.TWAIN_D_ARK_B
 @DisplayName("Репозиторий для работы с комментариями")
 @DataJpaTest
 @MockBean({GenreMapper.class, AuthorMapper.class})
-@Import({CommentMapperImpl.class, BookMapperImpl.class, BookRepositoryCustomImpl.class, BookCommentRepositoryCustomImpl.class})
+@Import({CommentMapperImpl.class, BookMapperImpl.class, BookRepositoryCustomImpl.class})
 public class CommentRepositoryTest {
 
     public static final int NUMBER_OF_TWAIN_D_ARK_COMMENTS = 2;

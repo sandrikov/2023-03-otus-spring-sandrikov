@@ -1,7 +1,6 @@
 package ru.otus.homework.books.services;
 
 import lombok.val;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.homework.books.domain.Genre;
@@ -42,13 +41,11 @@ public class GenreServiceImpl implements GenreService {
         this.genreMapper = genreMapper;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public ServiceResponse<List<GenreDto>> listGenres() {
         return done(genreRepository.findAll().stream().map(genreMapper::toDto).toList());
     }
 
-    @Transactional(readOnly = true)
     @Override
     public ServiceResponse<GenreDto> getGenre(long id) {
         try {
@@ -58,7 +55,6 @@ public class GenreServiceImpl implements GenreService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public ServiceResponse<GenreDto> findGenre(String name) {
         return genreRepository.findByName(name)
@@ -73,12 +69,8 @@ public class GenreServiceImpl implements GenreService {
             return error(String.format(GENRE_ALREADY_EXISTS, name));
         }
         val genre = new Genre(name);
-        try {
-            genreRepository.save(genre);
-            return done(genreMapper.toDto(genre));
-        } catch (DuplicateKeyException e) {
-            return error(String.format(GENRE_ALREADY_EXISTS, name));
-        }
+        genreRepository.save(genre);
+        return done(genreMapper.toDto(genre));
     }
 
     @Transactional
@@ -90,13 +82,11 @@ public class GenreServiceImpl implements GenreService {
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
         }
-        if (!Objects.equals(name, genre.getName())) {
-            if (genreRepository.findByName(name).isPresent()) {
-                return error(String.format(GENRE_ALREADY_EXISTS, name));
-            }
-            genre.setName(name);
-            genreRepository.save(genre);
+        if (!Objects.equals(name, genre.getName()) && genreRepository.findByName(name).isPresent()) {
+            return error(String.format(GENRE_ALREADY_EXISTS, name));
         }
+        genre.setName(name);
+        genreRepository.save(genre);
         return done(genreMapper.toDto(genre));
     }
 
@@ -116,7 +106,8 @@ public class GenreServiceImpl implements GenreService {
         return done(genreMapper.toDto(genre));
     }
 
-    private Genre findGenre(Long genreId) throws EntityNotFoundException {
+    @Override
+    public Genre findGenre(Long genreId) throws EntityNotFoundException {
         return ServiceUtils.findById(genreId, genreRepository::findById, GENRE_NOT_FOUND);
     }
 }

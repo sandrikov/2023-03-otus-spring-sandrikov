@@ -69,7 +69,7 @@ public class Book {
 
     public void removeComment(Comment comment) {
         if (comments != null) {
-            for (var it = comments.iterator(); it.hasNext();) {
+            for (var it = comments.iterator(); it.hasNext(); ) {
                 val existingComment = it.next();
                 if (existingComment.getId() == comment.getId()) {
                     it.remove();
@@ -80,9 +80,4 @@ public class Book {
         comment.setBook(null);
     }
 
-    public void removeAllComments() {
-        if (comments != null) {
-            comments.clear();
-        }
-    }
 }

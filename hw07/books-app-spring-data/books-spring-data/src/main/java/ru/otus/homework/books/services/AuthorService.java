@@ -1,6 +1,8 @@
 package ru.otus.homework.books.services;
 
+import ru.otus.homework.books.domain.Author;
 import ru.otus.homework.books.dto.AuthorDto;
+import ru.otus.homework.books.services.misc.EntityNotFoundException;
 
 import java.util.List;
 
@@ -17,4 +19,6 @@ public interface AuthorService {
     ServiceResponse<AuthorDto> renameAuthor(long id, String name);
 
     ServiceResponse<AuthorDto> deleteAuthor(long id);
+
+    Author findAuthor(Long genreId) throws EntityNotFoundException;
 }

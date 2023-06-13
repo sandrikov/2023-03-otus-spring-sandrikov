@@ -1,7 +1,9 @@
 package ru.otus.homework.books.services;
 
+import ru.otus.homework.books.domain.Book;
 import ru.otus.homework.books.dto.BookDto;
 import ru.otus.homework.books.dto.BookProjection;
+import ru.otus.homework.books.services.misc.EntityNotFoundException;
 
 import java.util.List;
 
@@ -9,14 +11,17 @@ public interface BookService {
 
     ServiceResponse<List<BookProjection>> listBooks(Long authorId, Long genreId, String name);
 
-    ServiceResponse<BookDto> getBook(Long id);
+    ServiceResponse<BookDto> getBook(long id);
 
-    ServiceResponse<BookDto> createBook(String name, Long authorId, Long genreId);
+    ServiceResponse<BookProjection> getBookProjection(Long id);
 
-    ServiceResponse<BookDto> modifyBook(Long id, String name, Long authorId, Long genreId);
+    ServiceResponse<BookProjection> createBook(String name, Long authorId, Long genreId);
 
-    ServiceResponse<BookDto> deleteBook(long id);
+    ServiceResponse<BookProjection> modifyBook(Long id, String name, Long authorId, Long genreId);
+
+    ServiceResponse<BookProjection> deleteBook(long id);
 
     ServiceResponse<Integer> deleteBooks(Long authorId, Long genreId);
 
+    Book findBook(Long bookId) throws EntityNotFoundException;
 }

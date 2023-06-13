@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import ru.otus.homework.books.domain.Genre;
@@ -26,13 +25,9 @@ public class GenreRepositoryTest {
     public static final String AUTOBIOGRAPHY = "Автобиография";
     public static final String DETECTIVE = "Детектив";
     public static final String HISTORICAL_FICTION = "Исторический роман";
-    public static final int NUMBER_OF_GENRES = 5;
     public static final long UNUSED_GENRE_ID = 2;
     public static final long DETECTIVE_GENRE_ID = 3;
     public static final long HISTORICAL_FICTION_ID = 5;
-
-    @Autowired
-    private TestEntityManager em;
 
     @Autowired
     private GenreRepository genreRepository;

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Lazy;
 public class SpringShellConfig {
 
     @Bean
-    public ShellHelper shellHelper(@Lazy Terminal terminal, @Lazy ShellColors shellColors) {
+    ShellHelper shellHelper(@Lazy Terminal terminal, @Lazy ShellColors shellColors) {
         return new ShellHelper(terminal, shellColors);
     }
 

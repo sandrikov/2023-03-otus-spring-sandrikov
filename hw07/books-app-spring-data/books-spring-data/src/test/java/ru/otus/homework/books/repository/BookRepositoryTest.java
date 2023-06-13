@@ -30,7 +30,7 @@ import static ru.otus.homework.books.repository.GenreRepositoryTest.HISTORICAL_F
 import static ru.otus.homework.books.repository.GenreRepositoryTest.HISTORICAL_FICTION_ID;
 import static ru.otus.homework.books.repository.GenreRepositoryTest.UNUSED_GENRE_ID;
 
-@DisplayName("Репозиторий на основе Jdbc для работы с книгами")
+@DisplayName("Репозиторий для работы с книгами")
 @DataJpaTest
 @Import({GenreMapperImpl.class, AuthorMapperImpl.class, CommentMapperImpl.class, BookMapperImpl.class})
 public class BookRepositoryTest {
@@ -200,15 +200,6 @@ public class BookRepositoryTest {
         assertEquals(author.getId(), book.get().getAuthor().getId(), "Author id");
         assertEquals(author.getName(), book.get().getAuthor().getName(), "Author name");
         assertEquals(HISTORICAL_FICTION, book.get().getGenre().getName(), "Genre name");
-    }
-
-    @DisplayName("Удаление книги по автору")
-    @Test
-    void deleteBooksByAuthor() {
-        val author = new Author(MARK_TWAIN_ID, MARK_TWAIN);
-        int deleted = bookRepository.deleteAllByAuthor(author);
-        assertEquals(NUMBER_OF_TWAIN_BOOKS, deleted, "Number of deleted books");
-        assertEquals(NUMBER_OF_BOOKS - NUMBER_OF_TWAIN_BOOKS, bookRepository.count(), "Number of rest books");
     }
 
     @DisplayName("Посчитать книги о разным критериям")

@@ -10,8 +10,6 @@ public interface SchemaSqlConstants {
 
     String UK_AUTHOR_NAME = "UK_author_name";
 
-    String UK_BOOK_TITLE_AUTHOR = "UK_book_title_author";
-
     String FK_BOOK_AUTHOR = "FK_book_author";
 
     String FK_BOOK_GENRE = "FK_book_genre";
