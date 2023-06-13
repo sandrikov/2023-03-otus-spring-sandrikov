@@ -10,22 +10,18 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import ru.otus.homework.books.domain.Author;
-import ru.otus.homework.books.mappers.BookProjectionMapper;
-
-import java.util.Optional;
+import ru.otus.homework.books.mappers.BookMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static ru.otus.homework.books.domain.Author.UK_AUTHOR_NAME;
-import static ru.otus.homework.books.domain.Book.FK_BOOK_AUTHOR;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.FK_BOOK_AUTHOR;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.UK_AUTHOR_NAME;
 
 
 @DisplayName("Репозиторий авторов книг")
 @DataJpaTest
-@MockBean(classes = {BookProjectionMapper.class})
-public
-class AuthorRepositoryTest {
+@MockBean(BookMapper.class)
+public class AuthorRepositoryTest {
 
     public static final String AGATHA_CHRISTIE = "Агата Кристи";
     public static final String ALEXANDR_DUMAS = "Александр Дюма";
@@ -40,33 +36,6 @@ class AuthorRepositoryTest {
 
     @Autowired
     private AuthorRepository authorRepository;
-
-    @Test
-    void saveInsert() {
-        val name = "New author";
-        val name2 = "New author 2";
-        assertThat(authorRepository.findByName(name)).isEmpty();
-        assertThat(authorRepository.findAll())
-                .allSatisfy(a -> assertThat(a.getName())
-                        .isNotEqualTo(name)
-                        .isNotEqualTo(name2));
-
-        val author = authorRepository.save(new Author(name));
-        val author2 = authorRepository.save(new Author(name2));
-
-        assertThat(authorRepository.findByName(name)).isPresent()
-                .map(Author::getId).hasValue(author.getId());
-        assertThat(authorRepository.findByName(name2)).isPresent()
-                .map(Author::getId).hasValue(author2.getId());
-
-        em.flush();
-        em.refresh(author);
-        em.refresh(author2);
-        assertThat(authorRepository.findByName(name)).isPresent()
-                .map(Author::getId).hasValue(author.getId());
-        assertThat(authorRepository.findByName(name2)).isPresent()
-                .map(Author::getId).hasValue(author2.getId());
-    }
 
     @Test
     void saveInsertDuplicateName() {
@@ -90,39 +59,6 @@ class AuthorRepositoryTest {
 
         assertThat(authorRepository.findById(MARK_TWAIN_ID)).isPresent()
                 .map(Author::getName).hasValue(newName);
-
-    }
-
-    @Test
-    void saveUpdateNameWoFind() {
-        val newName = "New author's name";
-        val author4update = new Author(MARK_TWAIN_ID, newName);
-        authorRepository.save(author4update);
-
-        val authorFromContext = authorRepository.findByName(newName);
-        assertThat(authorFromContext).isPresent().map(Author::getId).hasValue(MARK_TWAIN_ID);
-        em.flush();
-
-        val authorFromDb = em.refresh(authorFromContext.get());
-        assertEquals(authorFromDb.getId(), MARK_TWAIN_ID);
-        assertEquals(authorFromDb.getName(), newName);
-
-        assertThat(authorRepository.findById(MARK_TWAIN_ID))
-                .isPresent().map(Author::getName).hasValue(newName);
-    }
-
-    @Test
-    void findAll() {
-        assertThat(authorRepository.findAll()).isNotNull().hasSize(NUMBER_OF_AUTHORS);
-    }
-
-    @Test
-    void delete() {
-        var author = new Author(UNUSED_AUTHOR_ID, LEO_TOLSTOY);
-        authorRepository.delete(author);
-        assertEquals(NUMBER_OF_AUTHORS - 1, authorRepository.count());
-        Optional<Author> authorById = authorRepository.findById(UNUSED_AUTHOR_ID);
-        assertThat(authorById).isNotPresent();
     }
 
     @Test

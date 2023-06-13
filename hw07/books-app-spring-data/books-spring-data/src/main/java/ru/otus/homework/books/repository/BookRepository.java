@@ -14,9 +14,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface BookRepository extends JpaRepository<Book, Long>, ListQueryByExampleExecutor<Book>,
-        BookRepositoryCustom, BookCommentRepositoryCustom {
-
-    Optional<Book> findById(long id);
+        BookRepositoryCustom {
 
     /**
      * Find by alternative key
@@ -25,7 +23,13 @@ public interface BookRepository extends JpaRepository<Book, Long>, ListQueryByEx
     Optional<Book> findByTitleAndAuthor(String title, Author author);
 
     @EntityGraph("book-author-genre-entity-graph")
-    @Query("select b, count(c) from Book b left join Comment c on b = c.book group by b")
+    @Query("""
+        select b, count(c)
+          from Book b
+                join fetch b.author
+                join fetch b.genre
+                left join Comment c on b = c.book
+          group by b""")
     List<Object[]> findAllBookWithCommentCount();
 
     @EntityGraph("book-author-genre-entity-graph")

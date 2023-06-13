@@ -18,8 +18,8 @@ import java.util.function.Function;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingLong;
 import static org.springframework.shell.standard.ShellOption.NULL;
-import static ru.otus.homework.books.domain.Book.MAX_TITLE_LENGTH;
-import static ru.otus.homework.books.domain.Comment.MAX_TEXT_LENGTH;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.MAX_TEXT_LENGTH;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.MAX_TITLE_LENGTH;
 import static ru.otus.homework.books.services.ServiceResponse.Status.ERROR;
 
 @ShellComponent

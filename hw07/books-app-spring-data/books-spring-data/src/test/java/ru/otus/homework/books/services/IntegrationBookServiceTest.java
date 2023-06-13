@@ -9,7 +9,6 @@ import ru.otus.homework.books.dto.AuthorDto;
 import ru.otus.homework.books.dto.GenreDto;
 import ru.otus.homework.books.mappers.AuthorMapperImpl;
 import ru.otus.homework.books.mappers.BookMapperImpl;
-import ru.otus.homework.books.mappers.BookProjectionMapperImpl;
 import ru.otus.homework.books.mappers.CommentMapperImpl;
 import ru.otus.homework.books.mappers.GenreMapperImpl;
 
@@ -42,7 +41,7 @@ import static ru.otus.homework.books.services.ServiceResponse.Status.OK;
 @DataJpaTest
 @Import({AuthorServiceImpl.class, GenreServiceImpl.class, BookServiceImpl.class,
         GenreMapperImpl.class, AuthorMapperImpl.class, CommentMapperImpl.class,
-        BookProjectionMapperImpl.class, BookMapperImpl.class})
+        BookMapperImpl.class})
 class IntegrationBookServiceTest {
 
     @Autowired

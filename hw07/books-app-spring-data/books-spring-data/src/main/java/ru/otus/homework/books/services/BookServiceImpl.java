@@ -5,11 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.homework.books.domain.Author;
 import ru.otus.homework.books.domain.Book;
-import ru.otus.homework.books.domain.Comment;
 import ru.otus.homework.books.domain.Genre;
 import ru.otus.homework.books.dto.BookDto;
 import ru.otus.homework.books.dto.BookProjection;
-import ru.otus.homework.books.dto.CommentDto;
 import ru.otus.homework.books.mappers.BookMapper;
 import ru.otus.homework.books.mappers.CommentMapper;
 import ru.otus.homework.books.repository.AuthorRepository;
@@ -34,7 +32,7 @@ public class BookServiceImpl implements BookService {
 
     public static final String COMMENT_NOT_FOUND = "Comment is not found: %s";
 
-    private final BookRepository bookbookRepository;
+    private final BookRepository bookRepository;
 
     private final AuthorRepository authorRepository;
 
@@ -44,9 +42,9 @@ public class BookServiceImpl implements BookService {
 
     private final CommentMapper commentMapper;
 
-    public BookServiceImpl(BookRepository bookbookRepository, AuthorRepository authorRepository,
+    public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository,
                            GenreRepository genreRepository, BookMapper bookMapper, CommentMapper commentMapper) {
-        this.bookbookRepository = bookbookRepository;
+        this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
         this.genreRepository = genreRepository;
         this.bookMapper = bookMapper;
@@ -84,11 +82,11 @@ public class BookServiceImpl implements BookService {
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
         }
-        if (bookbookRepository.findByTitleAndAuthor(title, author).isPresent()) {
+        if (bookRepository.findByTitleAndAuthor(title, author).isPresent()) {
             return error(String.format(BOOK_ALREADY_EXISTS, author.getName(), title));
         }
         var book = new Book(title, author, genre);
-        bookbookRepository.save(book);
+        bookRepository.save(book);
         return done(bookMapper.toDto(book));
     }
 
@@ -100,7 +98,7 @@ public class BookServiceImpl implements BookService {
             val genre = findGenre(genreId);
             val book = findBook(id);
             if (title != null || author != null) {
-                val existingBook = bookbookRepository.findByTitleAndAuthor(title != null ? title : book.getTitle(),
+                val existingBook = bookRepository.findByTitleAndAuthor(title != null ? title : book.getTitle(),
                         author != null ? author : book.getAuthor());
                 if (existingBook.filter(b -> !id.equals(b.getId())).isPresent()) {
                     return error(String.format(BOOK_ALREADY_EXISTS, existingBook.get().getAuthor().getName(),
@@ -108,7 +106,7 @@ public class BookServiceImpl implements BookService {
                 }
             }
             partialUpdate(book, title, genreId, author, genre);
-            bookbookRepository.save(book);
+            bookRepository.save(book);
             return done(bookMapper.toDto(book));
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
@@ -132,7 +130,7 @@ public class BookServiceImpl implements BookService {
     public ServiceResponse<BookDto> deleteBook(long id) {
         try {
             var book = findBook(id);
-            bookbookRepository.delete(book);
+            bookRepository.delete(book);
             return done(bookMapper.toDto(book));
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
@@ -147,53 +145,16 @@ public class BookServiceImpl implements BookService {
             var genre = findGenre(genreId);
             if (author != null) {
                 if (genre != null) {
-                    return done(bookbookRepository.deleteAllByAuthorAndGenre(author, genre));
+                    return done(bookRepository.deleteAllByAuthorAndGenre(author, genre));
                 }
-                return done(bookbookRepository.deleteAllByAuthor(author));
+                return done(bookRepository.deleteAllByAuthor(author));
             }
             if (genre != null) {
-                return done(bookbookRepository.deleteAllByGenre(genre));
+                return done(bookRepository.deleteAllByGenre(genre));
             }
-            val count = (int)bookbookRepository.count();
-            bookbookRepository.deleteAll();
+            val count = (int) bookRepository.count();
+            bookRepository.deleteAll();
             return done(count);
-        } catch (EntityNotFoundException e) {
-            return error(e.getMessage());
-        }
-    }
-
-    @Transactional
-    @Override
-    public ServiceResponse<CommentDto> addComment(long bookId, CommentDto commentDto) {
-        try {
-            val book = findBook(bookId);
-            val comment = bookbookRepository.saveComment(book, commentMapper.toEntity(commentDto));
-            return done(commentMapper.toDto(comment));
-        } catch (EntityNotFoundException e) {
-            return error(e.getMessage());
-        }
-    }
-
-    @Transactional
-    @Override
-    public ServiceResponse<CommentDto> modifyComment(CommentDto commentDto) {
-        try {
-            var comment = findComment(commentDto.getId());
-            commentMapper.partialUpdate(commentDto, comment);
-            comment = bookbookRepository.saveComment(comment.getBook(), comment);
-            return done(commentMapper.toDto(comment));
-        } catch (EntityNotFoundException e) {
-            return error(e.getMessage());
-        }
-    }
-
-    @Transactional
-    @Override
-    public ServiceResponse<CommentDto> deleteComment(long commentId) {
-        try {
-            var comment = findComment(commentId);
-            bookbookRepository.deleteComment(comment.getBook(), comment);
-            return done(commentMapper.toDto(comment));
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
         }
@@ -201,11 +162,11 @@ public class BookServiceImpl implements BookService {
 
     private List<BookProjection> findData(Long authorId, Long genreId, String title) throws EntityNotFoundException {
         if (authorId == null && genreId == null && title == null) {
-            return bookbookRepository.findAllBookProjections();
+            return bookRepository.findAllBookProjections();
         }
         final var author = findAuthor(authorId);
         final var genre = findGenre(genreId);
-        return bookbookRepository.findAllBookProjections(author, genre, title);
+        return bookRepository.findAllBookProjections(author, genre, title);
     }
 
     private Genre findGenre(Long genreId) throws EntityNotFoundException {
@@ -217,11 +178,7 @@ public class BookServiceImpl implements BookService {
     }
 
     private Book findBook(Long bookId) throws EntityNotFoundException {
-        return ServiceUtils.findById(bookId, bookbookRepository::findById, BOOK_NOT_FOUND);
-    }
-
-    private Comment findComment(Long bookId) throws EntityNotFoundException {
-        return ServiceUtils.findById(bookId, bookbookRepository::findCommentById, COMMENT_NOT_FOUND);
+        return ServiceUtils.findById(bookId, bookRepository::findById, BOOK_NOT_FOUND);
     }
 
 }

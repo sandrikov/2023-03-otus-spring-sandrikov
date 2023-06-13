@@ -1,10 +1,11 @@
 package ru.otus.homework.books.mappers;
 
+import ru.otus.homework.books.domain.Book;
 import ru.otus.homework.books.domain.Comment;
 import ru.otus.homework.books.dto.CommentDto;
 
 public interface CommentMapper {
-    Comment toEntity(CommentDto commentDto);
+    Comment toEntity(CommentDto commentDto, Book book);
 
     CommentDto toDto(Comment comment);
 

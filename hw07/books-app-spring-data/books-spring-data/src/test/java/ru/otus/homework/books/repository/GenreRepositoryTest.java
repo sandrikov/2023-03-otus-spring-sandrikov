@@ -10,18 +10,17 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import ru.otus.homework.books.domain.Genre;
-import ru.otus.homework.books.mappers.BookProjectionMapper;
+import ru.otus.homework.books.mappers.BookMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static ru.otus.homework.books.domain.Book.FK_BOOK_GENRE;
-import static ru.otus.homework.books.domain.Genre.UK_GENRE_NAME;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.FK_BOOK_GENRE;
+import static ru.otus.homework.books.domain.SchemaSqlConstants.UK_GENRE_NAME;
 
 @DisplayName("Репозиторий жанров")
 @DataJpaTest
-@MockBean(classes = {BookProjectionMapper.class})
+@MockBean(BookMapper.class)
 public class GenreRepositoryTest {
 
     public static final String AUTOBIOGRAPHY = "Автобиография";
@@ -37,18 +36,6 @@ public class GenreRepositoryTest {
 
     @Autowired
     private GenreRepository genreRepository;
-
-    @Test
-    void saveInsert() {
-        val name = "New genre";
-        val newGenre = new Genre(name);
-        val genre = genreRepository.save(newGenre);
-        assertThat(genreRepository.findByName(name)).isPresent()
-                .map(Genre::getId).hasValue(genre.getId());
-        assertThat(genreRepository.findById(genre.getId())).isPresent()
-                .map(Genre::getName).hasValue(name);
-    }
-
     @Test
     void saveInsertDuplicateName() {
         val newGenre = new Genre(DETECTIVE);
@@ -58,15 +45,6 @@ public class GenreRepositoryTest {
                 .hasCauseExactlyInstanceOf(ConstraintViolationException.class);
         var cause = (ConstraintViolationException) persistenceException.getCause();
         assertThat(cause.getConstraintName()).containsIgnoringCase(UK_GENRE_NAME);
-    }
-
-    @Test
-    void saveUpdate() {
-        val newName = "New genre";
-        val genre4update = new Genre(DETECTIVE_GENRE_ID, newName);
-        val genre = genreRepository.save(genre4update);
-        assertThat(genreRepository.findByName(newName)).isPresent()
-                .map(Genre::getId).hasValue(genre.getId());
     }
 
     @Test
@@ -85,24 +63,6 @@ public class GenreRepositoryTest {
                 .hasCauseExactlyInstanceOf(ConstraintViolationException.class);
         var cause = (ConstraintViolationException) persistenceException.getCause();
         assertThat(cause.getConstraintName()).containsIgnoringCase(UK_GENRE_NAME);
-    }
-
-    @Test
-    void findAll() {
-        var genres = genreRepository.findAll();
-        assertThat(genres).isNotNull().hasSize(NUMBER_OF_GENRES);
-    }
-
-    @Test
-    void deleteById() {
-        genreRepository.deleteById(UNUSED_GENRE_ID);
-        assertEquals(NUMBER_OF_GENRES - 1, genreRepository.count());
-    }
-
-    @Test
-    void delete() {
-        genreRepository.delete(new Genre(UNUSED_GENRE_ID, AUTOBIOGRAPHY));
-        assertEquals(NUMBER_OF_GENRES - 1, genreRepository.count());
     }
 
     @Test

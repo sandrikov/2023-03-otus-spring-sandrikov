@@ -1,8 +1,10 @@
 package ru.otus.homework.books.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.otus.homework.books.domain.Book;
 import ru.otus.homework.books.domain.Comment;
 
-interface CommentRepository extends CrudRepository<Comment, Long> {
+public interface CommentRepository extends JpaRepository<Comment, Long> {
 
+    long countByBook(Book book);
 }
