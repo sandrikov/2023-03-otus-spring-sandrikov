@@ -1,0 +1,27 @@
+spring:
+  main:
+    banner-mode: "off"
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    initialization-mode: never
+
+  jpa:
+    defer-datasource-initialization: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+  shell:
+    interactive:
+      enabled: false
+
+  sql:
+    init:
+      mode: always
+      data-locations: data-test.sql
+
+logging:
+  level:
+    ROOT: FATAL
+
