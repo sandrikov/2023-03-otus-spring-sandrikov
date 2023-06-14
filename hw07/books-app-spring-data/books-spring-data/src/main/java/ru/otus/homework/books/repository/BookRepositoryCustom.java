@@ -24,6 +24,4 @@ public interface BookRepositoryCustom {
 
     List<BookProjection> findAllBookProjections();
 
-    long countByAuthorAndGenreAndTitle(Author author, Genre genre, String title);
-
 }

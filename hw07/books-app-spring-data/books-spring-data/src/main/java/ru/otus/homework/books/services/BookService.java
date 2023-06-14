@@ -24,4 +24,8 @@ public interface BookService {
     ServiceResponse<Integer> deleteBooks(Long authorId, Long genreId);
 
     Book findBook(Long bookId) throws EntityNotFoundException;
+
+    boolean existsByAuthorId(long authorId);
+
+    boolean existsByGenreId(long genreId);
 }

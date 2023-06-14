@@ -1,13 +1,13 @@
 package ru.otus.homework.books.services;
 
 import lombok.val;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.homework.books.domain.Author;
 import ru.otus.homework.books.dto.AuthorDto;
 import ru.otus.homework.books.mappers.AuthorMapper;
 import ru.otus.homework.books.repository.AuthorRepository;
-import ru.otus.homework.books.repository.BookRepository;
 import ru.otus.homework.books.services.misc.EntityNotFoundException;
 import ru.otus.homework.books.services.misc.ServiceUtils;
 
@@ -31,14 +31,14 @@ public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
 
-    private final BookRepository bookRepository;
-
     private final AuthorMapper authorMapper;
 
-    public AuthorServiceImpl(AuthorRepository authorRepository, BookRepository bookRepository,
-                             AuthorMapper authorMapper) {
+    private final BookService bookService;
+
+    public AuthorServiceImpl(AuthorRepository authorRepository, AuthorMapper authorMapper,
+                             @Lazy BookService bookService) {
         this.authorRepository = authorRepository;
-        this.bookRepository = bookRepository;
+        this.bookService = bookService;
         this.authorMapper = authorMapper;
     }
 
@@ -97,17 +97,16 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional
     @Override
     public ServiceResponse<AuthorDto> deleteAuthor(long id) {
-        Author author;
+        if (bookService.existsByAuthorId(id)) {
+            return error(String.format(INTEGRITY_VIOLATION_ERROR, id));
+        }
         try {
-            author = findAuthor(id);
+            val author = findAuthor(id);
+            authorRepository.delete(author);
+            return done(authorMapper.toDto(author));
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
         }
-        if (bookRepository.countByAuthorAndGenreAndTitle(author, null, null) > 0) {
-            return error(String.format(INTEGRITY_VIOLATION_ERROR, id));
-        }
-        authorRepository.delete(author);
-        return done(authorMapper.toDto(author));
     }
 
     @Override

@@ -14,6 +14,10 @@ import java.util.Optional;
 public interface BookRepository extends JpaRepository<Book, Long>, ListQueryByExampleExecutor<Book>,
         BookRepositoryCustom {
 
+    @EntityGraph("book-author-genre-entity-graph")
+    @Override
+    <S extends Book> List<S> findAll(Example<S> example);
+
     /**
      * Find by alternative key
      */
@@ -29,8 +33,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, ListQueryByEx
               group by b""")
     List<Object[]> findAllBookWithCommentCount();
 
-    @EntityGraph("book-author-genre-entity-graph")
-    @Override
-    <S extends Book> List<S> findAll(Example<S> example);
+    boolean existsByAuthorId(long authorId);
 
+    boolean existsByGenreId(long genreId);
 }

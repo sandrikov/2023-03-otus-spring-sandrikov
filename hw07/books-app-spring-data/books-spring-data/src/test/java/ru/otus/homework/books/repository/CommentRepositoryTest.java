@@ -14,6 +14,11 @@ import ru.otus.homework.books.mappers.AuthorMapper;
 import ru.otus.homework.books.mappers.BookMapperImpl;
 import ru.otus.homework.books.mappers.CommentMapperImpl;
 import ru.otus.homework.books.mappers.GenreMapper;
+import ru.otus.homework.books.services.AuthorService;
+import ru.otus.homework.books.services.BookService;
+import ru.otus.homework.books.services.BookServiceImpl;
+import ru.otus.homework.books.services.CommentService;
+import ru.otus.homework.books.services.GenreService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,8 +28,8 @@ import static ru.otus.homework.books.repository.BookRepositoryTest.TWAIN_D_ARK_B
 
 @DisplayName("Репозиторий для работы с комментариями")
 @DataJpaTest
-@MockBean({GenreMapper.class, AuthorMapper.class})
-@Import({CommentMapperImpl.class, BookMapperImpl.class, BookRepositoryCustomImpl.class})
+@MockBean({GenreMapper.class, AuthorMapper.class, AuthorService.class, GenreService.class, CommentService.class})
+@Import({CommentMapperImpl.class, BookMapperImpl.class, BookServiceImpl.class, BookRepositoryCustomImpl.class})
 public class CommentRepositoryTest {
 
     public static final int NUMBER_OF_TWAIN_D_ARK_COMMENTS = 2;
@@ -34,7 +39,7 @@ public class CommentRepositoryTest {
     @Autowired
     private CommentRepository commentRepository;
     @Autowired
-    private BookRepository bookRepository;
+    private BookService bookService;
     @Autowired
     private TestEntityManager em;
 
@@ -50,19 +55,17 @@ public class CommentRepositoryTest {
     }
 
     @Test
-    void saveComment() {
+    void saveComment() throws Exception {
         val text = "Comment #3 " + JEANNE_D_ARC + " of " + MARK_TWAIN;
 
-        val book = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
-        assertTrue(book.isPresent());
-        val commentToAdd = new Comment(text, book.get());
+        val book = bookService.findBook(TWAIN_D_ARK_BOOK_ID);
+        val commentToAdd = new Comment(text, book);
         commentRepository.save(commentToAdd);
         em.flush();
         em.clear();
 
-        val bookAfterSave = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
-        assertTrue(bookAfterSave.isPresent());
-        val comments = bookAfterSave.get().getComments();
+        val bookAfterSave = bookService.findBook(TWAIN_D_ARK_BOOK_ID);
+        val comments = bookAfterSave.getComments();
         assertEquals(NUMBER_OF_TWAIN_D_ARK_COMMENTS + 1, comments.size(),
                 "Number of comments");
         assertEquals(text, comments.get(NUMBER_OF_TWAIN_D_ARK_COMMENTS).getText(),
@@ -70,7 +73,7 @@ public class CommentRepositoryTest {
     }
 
     @Test
-    void deleteComment() {
+    void deleteComment() throws Exception {
         val comment1st = commentRepository.findById(TWAIN_D_ARK_1ST_COMMENT_ID);
         assertTrue(comment1st.isPresent());
         val commentToDelete = comment1st.get();
@@ -78,9 +81,8 @@ public class CommentRepositoryTest {
         em.flush();
         em.clear();
 
-        val bookAfterSave = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
-        assertTrue(bookAfterSave.isPresent());
-        val comments = bookAfterSave.get().getComments();
+        val bookAfterSave = bookService.findBook(TWAIN_D_ARK_BOOK_ID);
+        val comments = bookAfterSave.getComments();
         assertEquals(NUMBER_OF_TWAIN_D_ARK_COMMENTS - 1, comments.size(),
                 "Number of comments");
         assertEquals(TWAIN_D_ARK_2ND_COMMENT_ID,

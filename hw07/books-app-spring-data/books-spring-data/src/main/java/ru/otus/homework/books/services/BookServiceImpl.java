@@ -143,8 +143,19 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    @Override
     public Book findBook(Long bookId) throws EntityNotFoundException {
         return ServiceUtils.findById(bookId, bookRepository::findById, BOOK_NOT_FOUND);
+    }
+
+    @Override
+    public boolean existsByAuthorId(long authorId) {
+        return bookRepository.existsByAuthorId(authorId);
+    }
+
+    @Override
+    public boolean existsByGenreId(long genreId) {
+        return bookRepository.existsByGenreId(genreId);
     }
 
     private List<BookProjection> findData(Long authorId, Long genreId, String title) throws EntityNotFoundException {

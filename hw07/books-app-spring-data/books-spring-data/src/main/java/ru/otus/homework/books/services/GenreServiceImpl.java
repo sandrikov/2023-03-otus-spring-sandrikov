@@ -1,12 +1,12 @@
 package ru.otus.homework.books.services;
 
 import lombok.val;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.homework.books.domain.Genre;
 import ru.otus.homework.books.dto.GenreDto;
 import ru.otus.homework.books.mappers.GenreMapper;
-import ru.otus.homework.books.repository.BookRepository;
 import ru.otus.homework.books.repository.GenreRepository;
 import ru.otus.homework.books.services.misc.EntityNotFoundException;
 import ru.otus.homework.books.services.misc.ServiceUtils;
@@ -31,13 +31,14 @@ public class GenreServiceImpl implements GenreService {
 
     private final GenreRepository genreRepository;
 
-    private final BookRepository bookRepository;
-
     private final GenreMapper genreMapper;
 
-    public GenreServiceImpl(GenreRepository genreRepository, BookRepository bookRepository, GenreMapper genreMapper) {
+    private final BookService bookService;
+
+    public GenreServiceImpl(GenreRepository genreRepository, GenreMapper genreMapper,
+                            @Lazy BookService bookService) {
         this.genreRepository = genreRepository;
-        this.bookRepository = bookRepository;
+        this.bookService = bookService;
         this.genreMapper = genreMapper;
     }
 
@@ -93,17 +94,16 @@ public class GenreServiceImpl implements GenreService {
     @Transactional
     @Override
     public ServiceResponse<GenreDto> deleteGenre(long id) {
-        Genre genre;
+        if (bookService.existsByGenreId(id)) {
+            return error(String.format(INTEGRITY_VIOLATION_ERROR, id));
+        }
         try {
-            genre = findGenre(id);
+            val genre = findGenre(id);
+            genreRepository.delete(genre);
+            return done(genreMapper.toDto(genre));
         } catch (EntityNotFoundException e) {
             return error(e.getMessage());
         }
-        if (bookRepository.countByAuthorAndGenreAndTitle(null, genre, null) > 0) {
-            return error(String.format(INTEGRITY_VIOLATION_ERROR, id));
-        }
-        genreRepository.delete(genre);
-        return done(genreMapper.toDto(genre));
     }
 
     @Override

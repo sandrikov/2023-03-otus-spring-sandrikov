@@ -17,6 +17,8 @@ import ru.otus.homework.books.mappers.BookMapperImpl;
 import ru.otus.homework.books.mappers.CommentMapperImpl;
 import ru.otus.homework.books.mappers.GenreMapperImpl;
 
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -84,24 +86,20 @@ public class BookRepositoryTest {
         assertEquals(HISTORICAL_FICTION, book.get().getGenre().getName(), "Genre name");
     }
 
-    @DisplayName("Каскадное удаление комментариев. Lazy данные не загружены. Авторы и жанры не удалены")
+    @DisplayName("Каскадное удаление комментариев. Lazy данные не загружены. Авторы и жанры не пострадали")
     @Test
     void deleteById() {
         bookRepository.deleteById(TWAIN_D_ARK_BOOK_ID);
         assertEquals(NUMBER_OF_BOOKS - 1, bookRepository.count());
         val optionalBook = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
         assertThat(optionalBook).isNotPresent();
-        val commentIds = new long[]{6, 7};
-        for (long commentId : commentIds) {
-            assertThat(em.find(Comment.class, commentId)).isNull();
-        }
-        val authorById = em.find(Author.class, MARK_TWAIN_ID);
-        assertThat(authorById).isNotNull();
-        val genreById = em.find(Genre.class, HISTORICAL_FICTION_ID);
-        assertThat(genreById).isNotNull();
+        Stream.of(6,7).map(commentId -> em.find(Comment.class, commentId))
+                .forEach(comment -> assertThat(comment).isNull());
+        assertThat(em.find(Author.class, MARK_TWAIN_ID)).isNotNull();
+        assertThat(em.find(Genre.class, HISTORICAL_FICTION_ID)).isNotNull();
     }
 
-    @DisplayName("Каскадное удаление комментариев. Lazy данные в контексте. Авторы и жанры не удалены")
+    @DisplayName("Каскадное удаление комментариев. Lazy данные в контексте. Авторы и жанры не пострадали")
     @Test
     void delete() {
         val optionalBook = bookRepository.findById(TWAIN_D_ARK_BOOK_ID);
@@ -200,22 +198,6 @@ public class BookRepositoryTest {
         assertEquals(author.getId(), book.get().getAuthor().getId(), "Author id");
         assertEquals(author.getName(), book.get().getAuthor().getName(), "Author name");
         assertEquals(HISTORICAL_FICTION, book.get().getGenre().getName(), "Genre name");
-    }
-
-    @DisplayName("Посчитать книги о разным критериям")
-    @Test
-    void countByAuthorAndGenreAndTitle() {
-        val author = new Author(MARK_TWAIN_ID, MARK_TWAIN);
-        val genre = new Genre(DETECTIVE_GENRE_ID, DETECTIVE);
-        long count;
-        count = bookRepository.countByAuthorAndGenreAndTitle(null, null, null);
-        assertEquals(NUMBER_OF_BOOKS, count, "All books");
-        count = bookRepository.countByAuthorAndGenreAndTitle(author, null, null);
-        assertEquals(NUMBER_OF_TWAIN_BOOKS, count, "Number of Twain's books");
-        count = bookRepository.countByAuthorAndGenreAndTitle(null, genre, null);
-        assertEquals(NUMBER_OF_DETECTIVE_BOOKS, count, "Number of Twain's books");
-        count = bookRepository.countByAuthorAndGenreAndTitle(author, genre, null);
-        assertEquals(NUMBER_OF_TWAIN_DETECTIVES, count, "Number of Twain's detectives");
     }
 
 
