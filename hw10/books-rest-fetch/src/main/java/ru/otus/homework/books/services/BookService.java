@@ -3,29 +3,29 @@ package ru.otus.homework.books.services;
 import ru.otus.homework.books.domain.Book;
 import ru.otus.homework.books.rest.dto.BookDto;
 import ru.otus.homework.books.rest.dto.BookProjection;
-import ru.otus.homework.books.services.misc.EntityNotFoundException;
+import ru.otus.homework.books.services.misc.Reply;
 
 import java.util.List;
 
 public interface BookService {
 
-    ServiceResponse<List<BookProjection>> listBooks(Long authorId, Long genreId, String name);
+    Reply<List<BookProjection>> listBooks(Long authorId, Long genreId, String name);
 
-    ServiceResponse<BookDto> getBook(long id);
+    Reply<BookDto> getBook(long id);
 
-    ServiceResponse<BookProjection> getBookProjection(Long id);
+    Reply<BookProjection> getBookProjection(Long id);
 
-    ServiceResponse<BookDto> createBook(String name, Long authorId, Long genreId);
+    Reply<BookDto> createBook(String name, Long authorId, Long genreId);
 
-    ServiceResponse<BookProjection> modifyBook(Long id, String name, Long authorId, Long genreId);
+    Reply<BookProjection> modifyBook(Long id, String name, Long authorId, Long genreId);
 
-    ServiceResponse<BookDto> modifyBook(BookDto bookDto);
+    Reply<BookDto> modifyBook(BookDto bookDto);
 
-    ServiceResponse<BookProjection> deleteBook(long id);
+    Reply<BookProjection> deleteBook(long id);
 
-    ServiceResponse<Integer> deleteBooks(Long authorId, Long genreId);
+    Reply<Integer> deleteBooks(Long authorId, Long genreId);
 
-    Book findBook(Long bookId) throws EntityNotFoundException;
+    Book findBook(Long bookId);
 
     boolean existsByAuthorId(long authorId);
 

@@ -9,13 +9,14 @@ import ru.otus.homework.books.mappers.GenreMapper;
 import ru.otus.homework.books.repository.GenreRepository;
 import ru.otus.homework.books.rest.dto.GenreDto;
 import ru.otus.homework.books.services.misc.EntityNotFoundException;
+import ru.otus.homework.books.services.misc.Reply;
 import ru.otus.homework.books.services.misc.ServiceUtils;
 
 import java.util.List;
 import java.util.Objects;
 
-import static ru.otus.homework.books.services.ServiceResponse.done;
-import static ru.otus.homework.books.services.ServiceResponse.error;
+import static ru.otus.homework.books.services.misc.Reply.done;
+import static ru.otus.homework.books.services.misc.Reply.error;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.GENRE_NOT_FOUND;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getGenreAlreadyExistsMessage;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getGenreNotFoundMessage;
@@ -42,12 +43,12 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public ServiceResponse<List<GenreDto>> listGenres() {
+    public Reply<List<GenreDto>> listGenres() {
         return done(genreRepository.findAll().stream().map(genreMapper::toDto).toList());
     }
 
     @Override
-    public ServiceResponse<GenreDto> getGenre(long id) {
+    public Reply<GenreDto> getGenre(long id) {
         try {
             return done(genreMapper.toDto(findGenre(id)));
         } catch (EntityNotFoundException e) {
@@ -56,15 +57,15 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public ServiceResponse<GenreDto> findGenre(String name) {
+    public Reply<GenreDto> findGenre(String name) {
         return genreRepository.findByName(name)
-                .map(genreMapper::toDto).map(ServiceResponse::done)
+                .map(genreMapper::toDto).map(Reply::done)
                 .orElseGet(() -> error(getGenreNotFoundMessage(name)));
     }
 
     @Transactional
     @Override
-    public ServiceResponse<GenreDto> createGenre(String name) {
+    public Reply<GenreDto> createGenre(String name) {
         if (genreRepository.findByName(name).isPresent()) {
             return error(getGenreAlreadyExistsMessage(name));
         }
@@ -75,7 +76,7 @@ public class GenreServiceImpl implements GenreService {
 
     @Transactional
     @Override
-    public ServiceResponse<GenreDto> renameGenre(long id, String name) {
+    public Reply<GenreDto> renameGenre(long id, String name) {
         Genre genre;
         try {
             genre = findGenre(id);
@@ -92,7 +93,7 @@ public class GenreServiceImpl implements GenreService {
 
     @Transactional
     @Override
-    public ServiceResponse<GenreDto> deleteGenre(long id) {
+    public Reply<GenreDto> deleteGenre(long id) {
         if (bookService.existsByGenreId(id)) {
             return error(String.format(INTEGRITY_VIOLATION_ERROR, id));
         }
@@ -106,7 +107,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public Genre findGenre(Long genreId) throws EntityNotFoundException {
+    public Genre findGenre(Long genreId) {
         return ServiceUtils.findById(genreId, genreRepository::findById, GENRE_NOT_FOUND);
     }
 }

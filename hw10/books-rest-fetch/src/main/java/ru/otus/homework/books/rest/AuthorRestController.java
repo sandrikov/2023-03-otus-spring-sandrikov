@@ -43,7 +43,7 @@ public class AuthorRestController {
     public List<AuthorDto> getAllAuthors() {
         log.debug("REST request to get all Authors");
         var response = authorService.listAuthors();
-        return response.getData();
+        return response.data();
     }
 
     @PostMapping("/authors")

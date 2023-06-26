@@ -2,24 +2,24 @@ package ru.otus.homework.books.services;
 
 import ru.otus.homework.books.domain.Genre;
 import ru.otus.homework.books.rest.dto.GenreDto;
-import ru.otus.homework.books.services.misc.EntityNotFoundException;
+import ru.otus.homework.books.services.misc.Reply;
 
 import java.util.List;
 
 public interface GenreService {
 
-    ServiceResponse<List<GenreDto>> listGenres();
+    Reply<List<GenreDto>> listGenres();
 
-    ServiceResponse<GenreDto> getGenre(long id);
+    Reply<GenreDto> getGenre(long id);
 
-    ServiceResponse<GenreDto> findGenre(String name);
+    Reply<GenreDto> findGenre(String name);
 
-    ServiceResponse<GenreDto> createGenre(String name);
+    Reply<GenreDto> createGenre(String name);
 
-    ServiceResponse<GenreDto> renameGenre(long id, String name);
+    Reply<GenreDto> renameGenre(long id, String name);
 
-    ServiceResponse<GenreDto> deleteGenre(long id);
+    Reply<GenreDto> deleteGenre(long id);
 
-    Genre findGenre(Long genreId) throws EntityNotFoundException;
+    Genre findGenre(Long genreId);
 
 }

@@ -10,14 +10,15 @@ import ru.otus.homework.books.repository.CommentRepository;
 import ru.otus.homework.books.rest.dto.CommentDto;
 import ru.otus.homework.books.services.misc.EntityNotFoundException;
 import ru.otus.homework.books.services.misc.ServiceErrorMessages;
+import ru.otus.homework.books.services.misc.Reply;
 import ru.otus.homework.books.services.misc.ServiceUtils;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static ru.otus.homework.books.services.ServiceResponse.done;
-import static ru.otus.homework.books.services.ServiceResponse.error;
+import static ru.otus.homework.books.services.misc.Reply.done;
+import static ru.otus.homework.books.services.misc.Reply.error;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -38,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public ServiceResponse<CommentDto> addComment(long bookId, CommentDto commentDto) {
+    public Reply<CommentDto> addComment(long bookId, CommentDto commentDto) {
         try {
             val book = bookService.findBook(bookId);
             var comment = commentMapper.toEntity(commentDto, book);
@@ -52,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public ServiceResponse<CommentDto> modifyComment(CommentDto commentDto) {
+    public Reply<CommentDto> modifyComment(CommentDto commentDto) {
         try {
             var comment = findComment(commentDto.getId());
             commentMapper.partialUpdate(commentDto, comment);
@@ -65,7 +66,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public ServiceResponse<CommentDto> deleteComment(long commentId) {
+    public Reply<CommentDto> deleteComment(long commentId) {
         try {
             var comment = findComment(commentId);
             comment.getBook().removeComment(comment);
@@ -93,7 +94,7 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toMap(t -> (Long) t[0], t -> (Long) t[1]));
     }
 
-    private Comment findComment(Long commentId) throws EntityNotFoundException {
+    private Comment findComment(Long commentId) {
         return ServiceUtils.findById(commentId, commentRepository::findById, ServiceErrorMessages.COMMENT_NOT_FOUND);
     }
 

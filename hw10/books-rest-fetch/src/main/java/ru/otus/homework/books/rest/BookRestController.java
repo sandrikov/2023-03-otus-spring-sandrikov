@@ -45,7 +45,7 @@ public class BookRestController {
     public List<BookProjection> getAllBooks() {
         log.debug("REST request to get all Books");
         var response = bookService.listBooks(null, null, null);
-        return response.getData();
+        return response.data();
     }
 
     @PostMapping("/books")

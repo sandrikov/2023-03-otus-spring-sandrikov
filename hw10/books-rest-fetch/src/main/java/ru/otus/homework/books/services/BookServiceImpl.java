@@ -12,14 +12,15 @@ import ru.otus.homework.books.repository.BookRepository;
 import ru.otus.homework.books.rest.dto.BookDto;
 import ru.otus.homework.books.rest.dto.BookProjection;
 import ru.otus.homework.books.services.misc.EntityNotFoundException;
+import ru.otus.homework.books.services.misc.Reply;
 import ru.otus.homework.books.services.misc.ServiceUtils;
 
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.empty;
-import static ru.otus.homework.books.services.ServiceResponse.done;
-import static ru.otus.homework.books.services.ServiceResponse.error;
+import static ru.otus.homework.books.services.misc.Reply.done;
+import static ru.otus.homework.books.services.misc.Reply.error;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.BOOK_NOT_FOUND;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getBookAlreadyExistsMessage;
 
@@ -39,7 +40,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional(readOnly = true)
     @Override
-    public ServiceResponse<List<BookProjection>> listBooks(Long authorId, Long genreId, String title) {
+    public Reply<List<BookProjection>> listBooks(Long authorId, Long genreId, String title) {
         try {
             return done(findData(authorId, genreId, title));
         } catch (EntityNotFoundException e) {
@@ -49,7 +50,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional(readOnly = true)
     @Override
-    public ServiceResponse<BookDto> getBook(long id) {
+    public Reply<BookDto> getBook(long id) {
         try {
             return done(bookMapper.toDto(findBook(id)));
         } catch (EntityNotFoundException e) {
@@ -59,7 +60,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional(readOnly = true)
     @Override
-    public ServiceResponse<BookProjection> getBookProjection(Long id) {
+    public Reply<BookProjection> getBookProjection(Long id) {
         try {
             val book = findBook(id);
             long commentCount = commentService.countByBookId(book.getId());
@@ -71,7 +72,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public ServiceResponse<BookDto> createBook(String title, Long authorId, Long genreId) {
+    public Reply<BookDto> createBook(String title, Long authorId, Long genreId) {
         Author author;
         Genre genre;
         try {
@@ -90,7 +91,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public ServiceResponse<BookProjection> modifyBook(Long id, String title, Long authorId, Long genreId) {
+    public Reply<BookProjection> modifyBook(Long id, String title, Long authorId, Long genreId) {
         try {
             val book = findBook(id);
             val author = authorService.findAuthor(authorId);
@@ -109,7 +110,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public ServiceResponse<BookDto> modifyBook(BookDto bookDto) {
+    public Reply<BookDto> modifyBook(BookDto bookDto) {
         try {
             val book = findBook(bookDto.getId());
             val title = bookDto.getTitle();
@@ -131,7 +132,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public ServiceResponse<BookProjection> deleteBook(long id) {
+    public Reply<BookProjection> deleteBook(long id) {
         try {
             var book = findBook(id);
             bookRepository.delete(book);
@@ -143,7 +144,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public ServiceResponse<Integer> deleteBooks(Long authorId, Long genreId) {
+    public Reply<Integer> deleteBooks(Long authorId, Long genreId) {
         try {
             val author = authorService.findAuthor(authorId);
             val genre = genreService.findGenre(genreId);
@@ -161,7 +162,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book findBook(Long bookId) throws EntityNotFoundException {
+    public Book findBook(Long bookId) {
         return ServiceUtils.findById(bookId, bookRepository::findById, BOOK_NOT_FOUND);
     }
 
@@ -175,7 +176,7 @@ public class BookServiceImpl implements BookService {
         return bookRepository.existsByGenreId(genreId);
     }
 
-    private List<BookProjection> findData(Long authorId, Long genreId, String title) throws EntityNotFoundException {
+    private List<BookProjection> findData(Long authorId, Long genreId, String title) {
         if (authorId == null && genreId == null && title == null) {
             return bookRepository.findAllBookProjections();
         }

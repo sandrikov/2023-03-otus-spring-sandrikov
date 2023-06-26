@@ -12,6 +12,7 @@ import ru.otus.homework.books.mappers.GenreMapperImpl;
 import ru.otus.homework.books.rest.dto.AuthorDto;
 import ru.otus.homework.books.rest.dto.BookProjection;
 import ru.otus.homework.books.rest.dto.GenreDto;
+import ru.otus.homework.books.services.misc.Reply;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,8 +34,8 @@ import static ru.otus.homework.books.repository.BookRepositoryTest.TWAIN_D_ARK_B
 import static ru.otus.homework.books.repository.GenreRepositoryTest.AUTOBIOGRAPHY;
 import static ru.otus.homework.books.repository.GenreRepositoryTest.DETECTIVE;
 import static ru.otus.homework.books.repository.GenreRepositoryTest.HISTORICAL_FICTION;
-import static ru.otus.homework.books.services.ServiceResponse.Status.ERROR;
-import static ru.otus.homework.books.services.ServiceResponse.Status.OK;
+import static ru.otus.homework.books.services.misc.Reply.Status.ERROR;
+import static ru.otus.homework.books.services.misc.Reply.Status.OK;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getBookAlreadyExistsMessage;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getBookNotFoundMessage;
 
@@ -182,18 +183,18 @@ class BookServiceTest {
         assertEquals(expectedSize, books.size());
     }
 
-    private static void assertError(ServiceResponse<?> response, String expectedMessage) {
+    private static void assertError(Reply<?> response, String expectedMessage) {
         assertEquals(expectedMessage, assertError(response));
     }
 
-    private static String assertError(ServiceResponse<?> response) {
-        assertSame(ERROR, response.getStatus());
-        return response.getMessage();
+    private static String assertError(Reply<?> response) {
+        assertSame(ERROR, response.status());
+        return response.message();
     }
 
-    private static <T> T assertOK(ServiceResponse<T> response) {
-        assertSame(OK, response.getStatus());
-        return response.getData();
+    private static <T> T assertOK(Reply<T> response) {
+        assertSame(OK, response.status());
+        return response.data();
     }
 
     private AuthorDto getAuthor(String name) {

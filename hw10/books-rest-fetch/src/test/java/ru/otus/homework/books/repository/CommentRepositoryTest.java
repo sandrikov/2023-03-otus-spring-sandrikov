@@ -55,7 +55,7 @@ public class CommentRepositoryTest {
     }
 
     @Test
-    void saveComment() throws Exception {
+    void saveComment() {
         val text = "Comment #3 " + JEANNE_D_ARC + " of " + MARK_TWAIN;
 
         val book = bookService.findBook(TWAIN_D_ARK_BOOK_ID);
@@ -73,7 +73,7 @@ public class CommentRepositoryTest {
     }
 
     @Test
-    void deleteComment() throws Exception {
+    void deleteComment() {
         val comment1st = commentRepository.findById(TWAIN_D_ARK_1ST_COMMENT_ID);
         assertTrue(comment1st.isPresent());
         val commentToDelete = comment1st.get();

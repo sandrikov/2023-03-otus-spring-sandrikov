@@ -27,8 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.otus.homework.books.rest.misc.RestErrorMessages.getNewEntityHaveIdMessage;
-import static ru.otus.homework.books.services.ServiceResponse.done;
-import static ru.otus.homework.books.services.ServiceResponse.error;
+import static ru.otus.homework.books.services.misc.Reply.done;
+import static ru.otus.homework.books.services.misc.Reply.error;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getGenreNotFoundMessage;
 
 

@@ -9,13 +9,14 @@ import ru.otus.homework.books.mappers.AuthorMapper;
 import ru.otus.homework.books.repository.AuthorRepository;
 import ru.otus.homework.books.rest.dto.AuthorDto;
 import ru.otus.homework.books.services.misc.EntityNotFoundException;
+import ru.otus.homework.books.services.misc.Reply;
 import ru.otus.homework.books.services.misc.ServiceUtils;
 
 import java.util.List;
 import java.util.Objects;
 
-import static ru.otus.homework.books.services.ServiceResponse.done;
-import static ru.otus.homework.books.services.ServiceResponse.error;
+import static ru.otus.homework.books.services.misc.Reply.done;
+import static ru.otus.homework.books.services.misc.Reply.error;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.AUTHOR_NOT_FOUND;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getAuthorAlreadyExistsMessage;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getAuthorNotFoundMessage;
@@ -42,13 +43,13 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public ServiceResponse<List<AuthorDto>> listAuthors() {
+    public Reply<List<AuthorDto>> listAuthors() {
         val authors = authorRepository.findAll().stream().map(authorMapper::toDto).toList();
         return done(authors);
     }
 
     @Override
-    public ServiceResponse<AuthorDto> getAuthor(long id) {
+    public Reply<AuthorDto> getAuthor(long id) {
         try {
             return done(authorMapper.toDto(findAuthor(id)));
         } catch (EntityNotFoundException e) {
@@ -57,15 +58,15 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public ServiceResponse<AuthorDto> findAuthor(String name) {
+    public Reply<AuthorDto> findAuthor(String name) {
         return authorRepository.findByName(name)
-                .map(authorMapper::toDto).map(ServiceResponse::done)
+                .map(authorMapper::toDto).map(Reply::done)
                 .orElseGet(() -> error(getAuthorNotFoundMessage(name)));
     }
 
     @Transactional
     @Override
-    public ServiceResponse<AuthorDto> createAuthor(String name) {
+    public Reply<AuthorDto> createAuthor(String name) {
         if (authorRepository.findByName(name).isPresent()) {
             return error(getAuthorAlreadyExistsMessage(name));
         }
@@ -76,7 +77,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Transactional
     @Override
-    public ServiceResponse<AuthorDto> renameAuthor(long id, String name) {
+    public Reply<AuthorDto> renameAuthor(long id, String name) {
         Author author;
         try {
             author = findAuthor(id);
@@ -95,7 +96,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Transactional
     @Override
-    public ServiceResponse<AuthorDto> deleteAuthor(long id) {
+    public Reply<AuthorDto> deleteAuthor(long id) {
         if (bookService.existsByAuthorId(id)) {
             return error(String.format(INTEGRITY_VIOLATION_ERROR, id));
         }
@@ -109,7 +110,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author findAuthor(Long genreId) throws EntityNotFoundException {
+    public Author findAuthor(Long genreId) {
         return ServiceUtils.findById(genreId, authorRepository::findById, AUTHOR_NOT_FOUND);
     }
 

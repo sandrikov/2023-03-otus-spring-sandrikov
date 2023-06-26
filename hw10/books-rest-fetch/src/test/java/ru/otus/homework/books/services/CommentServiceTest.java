@@ -21,14 +21,15 @@ import ru.otus.homework.books.repository.CommentRepository;
 import ru.otus.homework.books.repository.GenreRepository;
 import ru.otus.homework.books.rest.dto.CommentDto;
 import ru.otus.homework.books.services.misc.EntityNotFoundException;
+import ru.otus.homework.books.services.misc.Reply;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static ru.otus.homework.books.services.ServiceResponse.Status.ERROR;
-import static ru.otus.homework.books.services.ServiceResponse.Status.OK;
+import static ru.otus.homework.books.services.misc.Reply.Status.ERROR;
+import static ru.otus.homework.books.services.misc.Reply.Status.OK;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getBookNotFoundMessage;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getCommentNotFoundMessage;
 
@@ -50,7 +51,7 @@ class CommentServiceTest {
 
     @DisplayName("Добавить комментарий к существующий книге")
     @Test
-    void addComment() throws Exception {
+    void addComment() {
         val textOfComment = "Text of new comment";
         // Entity
         val book = createBook();
@@ -62,16 +63,16 @@ class CommentServiceTest {
         // Check
         val response = commentService.addComment(book.getId(), new CommentDto(textOfComment));
         assertThat(response).isNotNull()
-                .returns(OK, ServiceResponse::getStatus)
-                .returns(null, ServiceResponse::getMessage)
-                .extracting(ServiceResponse::getData).isNotNull()
+                .returns(OK, Reply::status)
+                .returns(null, Reply::message)
+                .extracting(Reply::data).isNotNull()
                 .returns(1L, CommentDto::getId)
                 .returns(textOfComment, CommentDto::getText);
     }
 
     @DisplayName("Добавить комментарий к несуществующий книге")
     @Test
-    void addCommentNotFoundException() throws Exception {
+    void addCommentNotFoundException() {
         val textOfComment = "Does not matter";
         // Entity
         val book = createBook();
@@ -84,9 +85,9 @@ class CommentServiceTest {
         // Check
         val response = commentService.addComment(book.getId(), new CommentDto(textOfComment));
         assertThat(response).isNotNull()
-                .returns(ERROR, ServiceResponse::getStatus)
-                .returns(getBookNotFoundMessage(book.getId()), ServiceResponse::getMessage)
-                .extracting(ServiceResponse::getData).isNull();
+                .returns(ERROR, Reply::status)
+                .returns(getBookNotFoundMessage(book.getId()), Reply::message)
+                .extracting(Reply::data).isNull();
     }
 
     @DisplayName("Изменить существующий комментарий")
@@ -104,9 +105,9 @@ class CommentServiceTest {
         // Check
         val response = commentService.modifyComment(new CommentDto(id, textOfComment));
         assertThat(response).isNotNull()
-                .returns(OK, ServiceResponse::getStatus)
-                .returns(null, ServiceResponse::getMessage)
-                .extracting(ServiceResponse::getData).isNotNull()
+                .returns(OK, Reply::status)
+                .returns(null, Reply::message)
+                .extracting(Reply::data).isNotNull()
                 .returns(id, CommentDto::getId)
                 .returns(textOfComment, CommentDto::getText);
     }
@@ -121,9 +122,9 @@ class CommentServiceTest {
         // Check
         val response = commentService.modifyComment(new CommentDto(id, "New text of comment"));
         assertThat(response).isNotNull()
-                .returns(ERROR, ServiceResponse::getStatus)
-                .returns(getCommentNotFoundMessage(id), ServiceResponse::getMessage)
-                .extracting(ServiceResponse::getData).isNull();
+                .returns(ERROR, Reply::status)
+                .returns(getCommentNotFoundMessage(id), Reply::message)
+                .extracting(Reply::data).isNull();
     }
 
     @DisplayName("Удалить существующий комментарий")
@@ -140,9 +141,9 @@ class CommentServiceTest {
         // Check
         val response = commentService.deleteComment(id);
         assertThat(response).isNotNull()
-                .returns(OK, ServiceResponse::getStatus)
-                .returns(null, ServiceResponse::getMessage)
-                .extracting(ServiceResponse::getData).isNotNull()
+                .returns(OK, Reply::status)
+                .returns(null, Reply::message)
+                .extracting(Reply::data).isNotNull()
                 .returns(id, CommentDto::getId)
                 .returns(textOfComment, CommentDto::getText);
         assertThat(book.getComments()).isEmpty();

@@ -43,7 +43,7 @@ public class GenreRestController {
     public List<GenreDto> getAllGenres() {
         log.debug("REST request to get all Genres");
         var response = genreService.listGenres();
-        return response.getData();
+        return response.data();
     }
 
     @PostMapping("/genres")
