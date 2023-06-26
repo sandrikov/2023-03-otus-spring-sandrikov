@@ -1,0 +1,15 @@
+${Ansi.BLUE}  .----------------.  .----------------.  .----------------.  .----------------.  .----------------.
+${Ansi.BLUE} | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |
+${Ansi.BLUE} | |${Ansi.CYAN}   ______     ${Ansi.BLUE}| || |${Ansi.CYAN}     ____     ${Ansi.BLUE}| || |${Ansi.CYAN}     ____     ${Ansi.BLUE}| || |${Ansi.CYAN}  ___  ____   ${Ansi.BLUE}| || |${Ansi.CYAN}    _______   ${Ansi.BLUE}| |
+${Ansi.BLUE} | |${Ansi.CYAN}  |_   _ \    ${Ansi.BLUE}| || |${Ansi.CYAN}   .'    `.   ${Ansi.BLUE}| || |${Ansi.CYAN}   .'    `.   ${Ansi.BLUE}| || |${Ansi.CYAN} |_  ||_  _|  ${Ansi.BLUE}| || |${Ansi.CYAN}   /  ___  |  ${Ansi.BLUE}| |
+${Ansi.BLUE} | |${Ansi.CYAN}    | |_) |   ${Ansi.BLUE}| || |${Ansi.CYAN}  /  .--.  \  ${Ansi.BLUE}| || |${Ansi.CYAN}  /  .--.  \  ${Ansi.BLUE}| || |${Ansi.CYAN}   | |_/ /    ${Ansi.BLUE}| || |${Ansi.CYAN}  |  (__ \_|  ${Ansi.BLUE}| |
+${Ansi.BLUE} | |${Ansi.CYAN}    |  __'.   ${Ansi.BLUE}| || |${Ansi.CYAN}  | |    | |  ${Ansi.BLUE}| || |${Ansi.CYAN}  | |    | |  ${Ansi.BLUE}| || |${Ansi.CYAN}   |  __'.    ${Ansi.BLUE}| || |${Ansi.CYAN}   '.___`-.   ${Ansi.BLUE}| |
+${Ansi.BLUE} | |${Ansi.CYAN}   _| |__) |  ${Ansi.BLUE}| || |${Ansi.CYAN}  \  `--'  /  ${Ansi.BLUE}| || |${Ansi.CYAN}  \  `--'  /  ${Ansi.BLUE}| || |${Ansi.CYAN}  _| |  \ \_  ${Ansi.BLUE}| || |${Ansi.CYAN}  |`\____) |  ${Ansi.BLUE}| |
+${Ansi.BLUE} | |${Ansi.CYAN}  |_______/   ${Ansi.BLUE}| || |${Ansi.CYAN}   `.____.'   ${Ansi.BLUE}| || |${Ansi.CYAN}   `.____.'   ${Ansi.BLUE}| || |${Ansi.CYAN} |____||____| ${Ansi.BLUE}| || |${Ansi.CYAN}  |_______.'  ${Ansi.BLUE}| |
+${Ansi.BLUE} | |${Ansi.CYAN}              ${Ansi.BLUE}| || |${Ansi.CYAN}              ${Ansi.BLUE}| || |${Ansi.CYAN}              ${Ansi.BLUE}| || |${Ansi.CYAN}              ${Ansi.BLUE}| || |${Ansi.CYAN}              ${Ansi.BLUE}| |
+${Ansi.BLUE} | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
+${Ansi.BLUE} '----------------'  '----------------'  '----------------'  '----------------'  '----------------'
+
+${Ansi.GREEN} ${spring.application.name}
+${Ansi.BLACK} Spring Boot ${spring-boot.version}
+

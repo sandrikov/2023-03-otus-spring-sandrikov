@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Book</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+        select {
+            display: inline-block;
+            width: 205px;
+            border: 1px solid steelblue;
+        }
+        input {
+            width: 200px;
+            border: 1px solid steelblue;
+        }
+        input:read-only {
+            background: lightgray;
+        }
+        .row {
+            margin-top: 10px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+    <script>
+        function parseUrl() {
+            const path = window.location.pathname.split('/');
+            if (path.length < 4)
+                return {entity: path[1], id: "0", command: path[2]}
+            return {entity: path[1], id: path[2], command: path[3]};
+        }
+
+        function checkResponse(response) {
+            if (response.ok) {
+                return response;
+            }
+            return Promise.reject(response);
+        }
+
+        function handleErrors(error) {
+            if (error instanceof Response) {
+                if (error.status === 500) {
+                    try {
+                        error.json().then(json => showError(json.message || JSON.stringify(json)));
+                        return;
+                    } catch (ex) {
+                        console.error('Unhandled get json error: ', ex);
+                    }
+                }
+                showError('Path: ' + error.url + '<br>Status:' + error.status + ' ' + error.statusText);
+            } else {
+                showError('Something went wrong: ' + error);
+            }
+            console.error(error);
+        }
+
+        function showError(message) {
+            document.getElementById('log').innerHTML = message;
+        }
+
+        function getBook() {
+            const elemSelectAuthor = document.getElementById('author-select');
+            const elemSelectGenre = document.getElementById('genre-select');
+            const elementTitle = document.getElementById('title-input');
+            return {
+                id: document.getElementById('id-input').value,
+                title: elementTitle.value ? elementTitle.value.trim() : '',
+                author: {
+                    id: elemSelectAuthor.value,
+                    name: elemSelectAuthor.options[elemSelectAuthor.selectedIndex].text
+                },
+                genre: {
+                    id: elemSelectGenre.value,
+                    name: elemSelectGenre.options[elemSelectGenre.selectedIndex].text
+                }
+            }
+        }
+
+        function checkBook(book) {
+            const errorDiv = document.getElementById('log');
+            if (book.title == null || book.title.length < 2) {
+                errorDiv.innerHTML = 'Wrong title';
+                return false;
+            }
+            if (book.author == null || book.author.id === '0') {
+                errorDiv.innerHTML = 'Author is required';
+                return false;
+            }
+            if (book.genre == null || book.genre.id === '0') {
+                errorDiv.innerHTML = 'Genre is required';
+                return false;
+            }
+            return true;
+        }
+
+        function saveBook() {
+            const book = getBook();
+            if (!checkBook(book)) {
+                return;
+            }
+            const url = "/api/books" + (book.id === '0' ? '' : '/' + book.id);
+            const method = book.id === '0' ? 'POST' : 'PUT';
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(book)})
+                .then(checkResponse)
+                .then(rawResponse => rawResponse.json())
+                .then(() => {
+                    window.location.href = '/'
+                }).catch(handleErrors);
+        }
+
+    </script>
+
+</head>
+<body>
+
+    <div class="row" id="book-form-div">
+    </div>
+
+    <div class="row">
+        <div id="log" class="error"></div>
+    </div>
+
+    <div class="row">
+        <button id="save-button" type="button" hidden onclick="saveBook()">Save</button>
+        <a href="/"><button type="button">Cancel</button></a>
+    </div>
+
+    <script>
+        const request = parseUrl();
+        const title = request.command === 'add' ? 'Add book' : 'Edit info';
+        document.querySelector("title").innerHTML = title;
+
+        if (request.command === 'add') {
+            fetchAddData().then(fillForm).catch(handleErrors);
+        } else {
+            fetchData().then(fillForm).catch(handleErrors);
+        }
+
+        document.getElementById('save-button').hidden = false;
+
+        async function fetchData() {
+            const [bookResponse, authorsResponse, genresResponse] = await Promise.all([
+                fetch('/api/books/' + request.id).then(checkResponse),
+                fetch('/api/authors').then(checkResponse),
+                fetch('/api/genres').then(checkResponse)
+            ]);
+            const authors = await authorsResponse.json();
+            const genres = await genresResponse.json();
+            const book = await bookResponse.json();
+            return {authors: authors, genres: genres, book: book};
+        }
+
+        async function fetchAddData() {
+            const [authorsResponse, genresResponse] = await Promise.all([
+                fetch('/api/authors').then(checkResponse),
+                fetch('/api/genres').then(checkResponse)
+            ]);
+            const authors = await authorsResponse.json();
+            const genres = await genresResponse.json();
+            const book = {id: "0", title: null, author: {id: "0"}, genre: {id: "0"}}
+            return {authors: authors, genres: genres, book: book};
+        }
+
+        function fillForm(data) {
+            const book = data.book;
+            document.getElementById('book-form-div').innerHTML = `
+                <h3>${title}:</h3>
+                <div class="row" id="id-div" ${book.id === '0' ? 'hidden' : ''}>
+                    <label for="id-input">ID:</label>
+                    <input id="id-input" name="ID" type="number" readonly="readonly" value = "${book.id}">
+                </div>
+
+                <div class="row">
+                    <label for="title-input">Title:</label>
+                    <input id="title-input" name="title" type="text" required value = "${book.title ? book.title : ''}"/>
+                </div>
+
+                <div class="row">
+                    <label for="author-select">Author:</label>
+                    <select id="author-select" name="author" required>
+                        ${initSelection(data.authors, book.author.id, 'an author')}
+                    </select>
+                </div>
+
+                <div class="row">
+                    <label for="genre-select">Genre:</label>
+                    <select id="genre-select" name="genre" required>
+                        ${initSelection(data.genres, book.genre.id, 'a genre')}
+                    </select>
+                </div>`;
+        }
+
+        function initSelection(options, selectedId, entityName) {
+            let blob = '';
+            if (selectedId === '0') {
+                blob += `<option hidden disabled selected value="0"> -- select ${entityName} -- </option>`;
+            }
+            for (const opt of options) {
+                const selected = selectedId === opt.id ? 'selected' : '';
+                blob += `<option value="${opt.id}" ${selected}>${opt.name}</option>`;
+            }
+            return blob;
+        }
+
+    </script>
+
+</body>
+</html>
