@@ -22,17 +22,15 @@ import ru.otus.homework.books.mappers.AuthorMapper;
 import ru.otus.homework.books.repository.AuthorRepository;
 import ru.otus.homework.books.rest.dto.AuthorDto;
 import ru.otus.homework.books.rest.misc.BookAppException;
-import ru.otus.homework.books.rest.misc.ResponseUtil;
 import ru.otus.homework.books.services.AuthorService;
 
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Objects;
 
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.notFound;
 import static ru.otus.homework.books.rest.misc.ResponseUtil.toURI;
 import static ru.otus.homework.books.rest.misc.RestErrorMessages.getInvalidIdMessage;
-import static ru.otus.homework.books.rest.misc.RestErrorMessages.getNewEntityHaveIdMessage;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getAuthorNotFoundMessage;
 
 @RestController
@@ -41,45 +39,51 @@ import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getAutho
 @Log4j2
 public class AuthorRestController {
 
-    private final AuthorRepository authorRepository;
+    private final AuthorService authorService;
 
     private final AuthorMapper authorMapper;
 
     @GetMapping("/authors")
     public Flux<AuthorDto> getAllAuthors() {
         log.debug("REST request to get all Authors");
-        return authorRepository.findAll().map(authorMapper::toDto);
+        return authorService.listAuthors();
     }
 
     @GetMapping("/authors/{id}")
     public Mono<ResponseEntity<AuthorDto>> getAuthor(@PathVariable Long id) {
         log.debug("REST request to get Author : {}", id);
-        return authorRepository.findById(id)
-                .map(authorMapper::toDto)
-                .map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.fromCallable(() -> ResponseEntity.notFound().build()));
+        return authorService.getAuthor(id).map(ResponseEntity::ok)
+                .switchIfEmpty(Mono.fromCallable(() -> notFound().build()));
     }
 
     @PostMapping("/authors")
-    public Mono<ResponseEntity<AuthorDto>> createAuthor(@RequestBody Mono<AuthorDto> authorDto) throws URISyntaxException {
+    public Mono<ResponseEntity<AuthorDto>> createAuthor(@RequestBody Mono<AuthorDto> authorDto) {
         log.debug("REST request to save Author");
-        return authorRepository.save(authorDto.map(authorMapper::toEntity))
-                .map(authorMapper::toDto)
-                .map(entity -> ResponseEntity.created(toURI("/api/authors/" + entity.getId()))
-                        .body(entity));
+        return authorService.createAuthor(authorDto)
+                .map(dto -> created(toURI("/api/authors/" + dto.getId()))
+                        .body(dto));
     }
 
     @PutMapping("/authors/{id}")
     public Mono<ResponseEntity<AuthorDto>> updateAuthor(@PathVariable(value = "id") final Long id,
-                                              @RequestBody Mono<AuthorDto> authorDto) {
+                                                        @RequestBody Mono<AuthorDto> authorDto) {
         log.debug("REST request to update Author : {}", id);
-//        if (!Objects.equals(id, authorDto.getId())) {
-//            throw new BookAppException(getInvalidIdMessage(id, authorDto.getId()));
-//        }
-        Mono<Author> authorMono = authorDto
-                .filter(dto -> Objects.equals(id, authorDto.getId())
-                .map(authorMapper::toEntity);
-        val author = authorRepository.save(authorMono);
+        val author = authorRepository.save(authorDto
+                .handle((dto, sink) -> {
+                    if (!Objects.equals(id, dto.getId())) {
+                        sink.error(new BookAppException(getInvalidIdMessage(id, dto.getId())));
+                        sink.next(authorMapper.toEntity(dto));
+                        return;
+                    }
+                    sink.error(new BookAppException(getInvalidIdMessage(id, dto.getId())));
+                    if (Objects.equals(id, dto.getId())) {
+                        sink.next(authorMapper.toEntity(dto));
+                        return;
+                    }
+                    sink.error(new BookAppException(getInvalidIdMessage(id, dto.getId())));
+                }))
+                .map(author)
+                ;
         val result = authorService.renameAuthor(id, author.getName()).orElseThrow(BookAppException::new);
         return ResponseEntity.ok().body(result);
     }
@@ -92,7 +96,7 @@ public class AuthorRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping(value = "/authors/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/authors/{id}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<AuthorDto> partialUpdateAuthor(
             @PathVariable(value = "id") final Long id,
             @RequestBody AuthorDto author) {
@@ -105,5 +109,5 @@ public class AuthorRestController {
                         new ResponseStatusException(HttpStatus.NOT_FOUND) : new BookAppException(e));
         return ResponseEntity.ok().body(patchedAuthor);
     }
-    
+
 }

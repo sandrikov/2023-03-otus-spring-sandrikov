@@ -1,25 +1,25 @@
 package ru.otus.homework.books.services;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.homework.books.rest.dto.AuthorDto;
 import ru.otus.homework.books.domain.Author;
 import ru.otus.homework.books.services.misc.Reply;
 
-import java.util.List;
-
 
 public interface AuthorService {
 
-    Reply<List<AuthorDto>> listAuthors();
+    Flux<AuthorDto> listAuthors();
 
-    Reply<AuthorDto> getAuthor(long id);
+    Mono<AuthorDto> getAuthor(Long id);
 
-    Reply<AuthorDto> findAuthor(String name);
+    Mono<AuthorDto> findAuthor(String name);
 
-    Reply<AuthorDto> createAuthor(String name);
+    Mono<AuthorDto> createAuthor(Mono<AuthorDto> authorDto);
 
-    Reply<AuthorDto> renameAuthor(long id, String name);
+    Mono<AuthorDto> updateAuthor(Long id, Mono<AuthorDto> authorDto);
 
-    Reply<AuthorDto> deleteAuthor(long id);
+    Reply<AuthorDto> deleteAuthor(Long id);
 
     Author findAuthor(Long genreId);
 

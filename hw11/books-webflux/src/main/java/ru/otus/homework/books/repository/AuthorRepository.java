@@ -11,5 +11,7 @@ public interface AuthorRepository extends ReactiveCrudRepository<Author, Long> {
 
     Mono<Author> findByName(String name);
 
+    Mono<Boolean> existsByName(String name);
+
     Mono<Author> save(Mono<Author> person);
 }
