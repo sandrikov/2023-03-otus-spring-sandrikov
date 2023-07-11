@@ -1,30 +1,31 @@
 package ru.otus.homework.books.domain;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
+import org.springframework.data.relational.core.mapping.Table;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@Entity
 @Table(name = "genres")
+@ToString
 public class Genre {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private long id;
+    private final Long id;
 
-    private String name;
+    @NotNull
+    private final String name;
+
+    @PersistenceCreator
+    public Genre(Long id, @NotNull String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public Genre(String name) {
         this(0L, name);

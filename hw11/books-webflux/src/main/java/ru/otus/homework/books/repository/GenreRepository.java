@@ -1,12 +1,13 @@
 package ru.otus.homework.books.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Mono;
 import ru.otus.homework.books.domain.Genre;
 
-import java.util.Optional;
+public interface GenreRepository extends ReactiveCrudRepository<Genre, Long> {
 
-public interface GenreRepository extends JpaRepository<Genre, Long> {
+    Mono<Boolean> existsByName(String name);
 
-    Optional<Genre> findByName(String name);
+    Mono<Genre> save(Mono<Genre> person);
 
 }

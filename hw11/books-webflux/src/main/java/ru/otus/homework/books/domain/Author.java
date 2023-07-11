@@ -1,12 +1,12 @@
 package ru.otus.homework.books.domain;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.relational.core.mapping.Table;
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter

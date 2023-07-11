@@ -7,4 +7,6 @@ public interface GenreMapper {
     Genre toEntity(GenreDto genreDto);
 
     GenreDto toDto(Genre genre);
+
+    Genre partialUpdate(GenreDto dto, Genre target);
 }

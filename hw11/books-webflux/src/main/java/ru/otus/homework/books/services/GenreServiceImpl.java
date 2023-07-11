@@ -1,26 +1,19 @@
 package ru.otus.homework.books.services;
 
-import lombok.val;
-import org.springframework.context.annotation.Lazy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.homework.books.domain.Genre;
 import ru.otus.homework.books.mappers.GenreMapper;
 import ru.otus.homework.books.repository.GenreRepository;
 import ru.otus.homework.books.rest.dto.GenreDto;
-import ru.otus.homework.books.services.misc.EntityNotFoundException;
-import ru.otus.homework.books.services.misc.Reply;
-import ru.otus.homework.books.services.misc.ServiceUtils;
+import ru.otus.homework.books.rest.misc.BookAppException;
 
-import java.util.List;
-import java.util.Objects;
-
-import static ru.otus.homework.books.services.misc.Reply.done;
-import static ru.otus.homework.books.services.misc.Reply.error;
-import static ru.otus.homework.books.services.misc.ServiceErrorMessages.GENRE_NOT_FOUND;
 import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getGenreAlreadyExistsMessage;
-import static ru.otus.homework.books.services.misc.ServiceErrorMessages.getGenreNotFoundMessage;
 
+@RequiredArgsConstructor
 @Service
 public class GenreServiceImpl implements GenreService {
 
@@ -33,81 +26,45 @@ public class GenreServiceImpl implements GenreService {
 
     private final GenreMapper genreMapper;
 
-    private final BookService bookService;
-
-    public GenreServiceImpl(GenreRepository genreRepository, GenreMapper genreMapper,
-                            @Lazy BookService bookService) {
-        this.genreRepository = genreRepository;
-        this.bookService = bookService;
-        this.genreMapper = genreMapper;
+    @Override
+    public Flux<GenreDto> listGenres() {
+        return genreRepository.findAll().map(genreMapper::toDto);
     }
 
     @Override
-    public Reply<List<GenreDto>> listGenres() {
-        return done(genreRepository.findAll().stream().map(genreMapper::toDto).toList());
-    }
-
-    @Override
-    public Reply<GenreDto> getGenre(long id) {
-        try {
-            return done(genreMapper.toDto(findGenre(id)));
-        } catch (EntityNotFoundException e) {
-            return error(e.getMessage());
-        }
-    }
-
-    @Override
-    public Reply<GenreDto> findGenre(String name) {
-        return genreRepository.findByName(name)
-                .map(genreMapper::toDto).map(Reply::done)
-                .orElseGet(() -> error(getGenreNotFoundMessage(name)));
+    public Mono<GenreDto> getGenre(long id) {
+        return genreRepository.findById(id).map(genreMapper::toDto);
     }
 
     @Transactional
     @Override
-    public Reply<GenreDto> createGenre(String name) {
-        if (genreRepository.findByName(name).isPresent()) {
-            return error(getGenreAlreadyExistsMessage(name));
-        }
-        val genre = new Genre(name);
-        genreRepository.save(genre);
-        return done(genreMapper.toDto(genre));
+    public  Mono<GenreDto> createGenre(Mono<GenreDto> genreDto) {
+        Mono<Genre> genreToCreate = genreDto
+                .handle((dto, sink) -> {
+                    if (genreRepository.existsByName(dto.getName()).block()) {
+                        sink.error(new BookAppException(getGenreAlreadyExistsMessage(dto.getName())));
+                    } else {
+                        sink.next(genreMapper.toEntity(dto));
+                    }
+                });
+        return genreRepository.save(genreToCreate).map(genreMapper::toDto);
     }
 
     @Transactional
     @Override
-    public Reply<GenreDto> renameGenre(long id, String name) {
-        Genre genre;
-        try {
-            genre = findGenre(id);
-        } catch (EntityNotFoundException e) {
-            return error(e.getMessage());
-        }
-        if (!Objects.equals(name, genre.getName()) && genreRepository.findByName(name).isPresent()) {
-            return error(getGenreAlreadyExistsMessage(name));
-        }
-        genre.setName(name);
-        genreRepository.save(genre);
-        return done(genreMapper.toDto(genre));
+    public Mono<GenreDto> updateGenre(long id, Mono<GenreDto> genreDto) {
+        return genreRepository.findById(id)
+                .flatMap(s -> genreRepository
+                        .save(genreDto.map(dto -> genreMapper.partialUpdate(dto, s)))
+                        .map(genreMapper::toDto));
     }
 
     @Transactional
     @Override
-    public Reply<GenreDto> deleteGenre(long id) {
-        if (bookService.existsByGenreId(id)) {
-            return error(String.format(INTEGRITY_VIOLATION_ERROR, id));
-        }
-        try {
-            val genre = findGenre(id);
-            genreRepository.delete(genre);
-            return done(genreMapper.toDto(genre));
-        } catch (EntityNotFoundException e) {
-            return error(e.getMessage());
-        }
+    public Mono<GenreDto> deleteGenre(long id) {
+        return genreRepository.findById(id)
+                .flatMap(s -> genreRepository.delete(s)
+                        .then(Mono.just(genreMapper.toDto(s))));
     }
 
-    @Override
-    public Genre findGenre(Long genreId) {
-        return ServiceUtils.findById(genreId, genreRepository::findById, GENRE_NOT_FOUND);
-    }
 }

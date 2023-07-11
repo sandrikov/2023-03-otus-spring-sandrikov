@@ -1,25 +1,19 @@
 package ru.otus.homework.books.services;
 
-import ru.otus.homework.books.domain.Genre;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.homework.books.rest.dto.GenreDto;
-import ru.otus.homework.books.services.misc.Reply;
-
-import java.util.List;
 
 public interface GenreService {
 
-    Reply<List<GenreDto>> listGenres();
+    Flux<GenreDto> listGenres();
 
-    Reply<GenreDto> getGenre(long id);
+    Mono<GenreDto> getGenre(long id);
 
-    Reply<GenreDto> findGenre(String name);
+    Mono<GenreDto> createGenre(Mono<GenreDto> genreDto);
 
-    Reply<GenreDto> createGenre(String name);
+    Mono<GenreDto> updateGenre(long id, Mono<GenreDto> genreDto);
 
-    Reply<GenreDto> renameGenre(long id, String name);
-
-    Reply<GenreDto> deleteGenre(long id);
-
-    Genre findGenre(Long genreId);
+    Mono<GenreDto> deleteGenre(long id);
 
 }

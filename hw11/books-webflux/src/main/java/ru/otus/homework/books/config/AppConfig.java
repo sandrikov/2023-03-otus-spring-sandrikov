@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Configuration
-public class ApplConfig {
+public class AppConfig {
     private static final int THREAD_POOL_SIZE = 2;
 
     @Bean

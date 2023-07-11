@@ -1,39 +1,20 @@
 package ru.otus.homework.books.repository;
 
-import org.springframework.data.domain.Example;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.ListQueryByExampleExecutor;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Mono;
 import ru.otus.homework.books.domain.Author;
 import ru.otus.homework.books.domain.Book;
 
-import java.util.List;
-import java.util.Optional;
+public interface BookRepository extends ReactiveCrudRepository<Book, Long> {
 
-public interface BookRepository extends JpaRepository<Book, Long>, ListQueryByExampleExecutor<Book>,
-        BookRepositoryCustom {
-
-    @EntityGraph("book-author-genre-entity-graph")
-    @Override
-    <S extends Book> List<S> findAll(Example<S> example);
+    Mono<Book> save(Mono<Book> person);
 
     /**
      * Find by alternative key
      */
-    @EntityGraph("book-author-genre-entity-graph")
-    Optional<Book> findByTitleAndAuthor(String title, Author author);
+    Mono<Book> findByTitleAndAuthor(String title, Author author);
 
-    @Query("""
-            select b, count(c)
-              from Book b
-                    join fetch b.author
-                    join fetch b.genre
-                    left join Comment c on b = c.book
-              group by b""")
-    List<Object[]> findAllBookWithCommentCount();
+    Mono<Boolean> existsByAuthorId(long authorId);
 
-    boolean existsByAuthorId(long authorId);
-
-    boolean existsByGenreId(long genreId);
+    Mono<Boolean> existsByGenreId(long genreId);
 }

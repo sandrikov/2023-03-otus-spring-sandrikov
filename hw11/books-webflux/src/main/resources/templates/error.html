@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Error Page</title>
+    <style>
+        table td{
+            vertical-align:top;
+            border:solid 1px #888;
+            padding:10px;
+        }
+        .appError {
+            border: none;
+            width: 600px;
+            border-collapse: collapse;
+        }
+        .appError tr td, th {
+            padding: 5px;
+            border: none;
+            color: red;
+        }
+        .appError td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+<h1>Error Page</h1>
+<table class="appError" th:if="${exception != null and #strings.endsWith(exception,'BookAppException')}">
+    <tr>
+        <td th:text="${message}">Book already exists: Agatha Christie 'The Murder on the Links'</td>
+    </tr>
+    <tr>
+        <td>
+            <button onclick="history.back()">Go Back</button>
+        </td>
+    </tr>
+</table>
+<table th:if="${exception == null or #strings.endsWith(exception,'BookAppException') == false}">
+    <tr>
+        <td>Date</td>
+        <td th:text="${timestamp}"/>
+    </tr>
+    <tr>
+        <td>Path</td>
+        <td th:text="${path}"/>
+    </tr>
+    <tr>
+        <td>Error</td>
+        <td th:text="${error}"/>
+    </tr>
+    <tr>
+        <td>Status</td>
+        <td th:text="${status}"/>
+    </tr>
+    <tr>
+        <td>Message</td>
+        <td th:text="${message}"/>
+    </tr>
+    <tr>
+        <td>Exception</td>
+        <td th:text="${exception}"/>
+    </tr>
+    <tr>
+        <td>Trace</td>
+        <td>
+            <pre th:text="${trace}"/>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <button onclick="history.back()">Go Back</button>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

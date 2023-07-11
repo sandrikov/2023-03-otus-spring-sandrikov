@@ -1,34 +1,19 @@
 package ru.otus.homework.books.services;
 
-import ru.otus.homework.books.domain.Book;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.homework.books.rest.dto.BookDto;
-import ru.otus.homework.books.rest.dto.BookProjection;
-import ru.otus.homework.books.services.misc.Reply;
-
-import java.util.List;
 
 public interface BookService {
 
-    Reply<List<BookProjection>> listBooks(Long authorId, Long genreId, String name);
+    Flux<BookDto> listBooks();
 
-    Reply<BookDto> getBook(long id);
+    Mono<BookDto> getBook(long id);
 
-    Reply<BookProjection> getBookProjection(Long id);
+    Mono<BookDto> createBook(Mono<BookDto> bookDto);
 
-    Reply<BookDto> createBook(String name, Long authorId, Long genreId);
+    Mono<BookDto> updateBook(Long id, Mono<BookDto> bookDto);
 
-    Reply<BookProjection> modifyBook(Long id, String name, Long authorId, Long genreId);
-
-    Reply<BookDto> modifyBook(BookDto bookDto);
-
-    Reply<BookProjection> deleteBook(long id);
-
-    Reply<Integer> deleteBooks(Long authorId, Long genreId);
-
-    Book findBook(Long bookId);
-
-    boolean existsByAuthorId(long authorId);
-
-    boolean existsByGenreId(long genreId);
+    Mono<BookDto> deleteBook(Long id);
 
 }
