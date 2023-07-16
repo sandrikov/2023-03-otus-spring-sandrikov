@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Book info</title>
+
+  <style>
+    body {
+      padding: 50px;
+    }
+    label {
+      display: inline-block;
+      width: 100px;
+    }
+    select {
+      display: inline-block;
+      width: 205px;
+      border: 1px solid steelblue;
+    }
+    input {
+      width: 200px;
+      border: 1px solid steelblue;
+    }
+    input:read-only {
+      background: lightgray;
+    }
+    .row {
+      margin-top: 10px;
+      white-space: nowrap;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+
+  <script>
+
+    function parseUrl() {
+      const path = window.location.pathname.split('/');
+      if (path.length < 4)
+        return {entity: path[1], id: "0", command: path[2]}
+      return {entity: path[1], id: path[2], command: path[3]};
+    }
+
+    function checkResponse(response) {
+      if (response.ok) {
+        return response;
+      }
+      return Promise.reject(response);
+    }
+
+    function handleErrors(error) {
+      if (error instanceof Response) {
+        if (error.status === 500) {
+          try {
+            error.json().then(json => showError(json.message || JSON.stringify(json)));
+            return;
+          } catch (ex) {
+            console.error('Unhandled get json error: ', ex);
+          }
+        }
+        showError('Path: ' + error.url + '<br>Status:' + error.status + ' ' + error.statusText);
+      } else {
+        showError('Something went wrong: ' + error);
+      }
+      console.error(error);
+    }
+
+    function showError(message) {
+      document.getElementById('log').innerHTML = message;
+    }
+
+    function deleteBook(id) {
+      fetch('/api/books/' + id, {
+        method: 'DELETE',
+        redirect: 'manual',
+      })
+        .then(checkResponse)
+        .then(() => window.location.href = '/')
+        .catch(handleErrors);
+    }
+  </script>
+</head>
+<body>
+  <noscript>
+    <h1>You need to enable JavaScript to run this app.</h1>
+  </noscript>
+
+  <div class="row" id="root"></div>
+
+  <div class="row">
+    <div class="error"  id="log"></div>
+  </div>
+
+  <div class="row" id="buttons">
+    <a href="/"><button type="button">Back</button></a>
+  </div>
+
+  <script>
+    const request = parseUrl();
+    const title = request.command === 'delete' ? 'Delete book' : 'Book info';
+    document.querySelector("title").innerHTML = title;
+    fetch('/api/books/' + request.id)
+              .then(checkResponse)
+              .then(response => response.json())
+              .then(outputBook)
+              .catch(handleErrors);
+
+    function outputBook(book) {
+      document.querySelector("title").innerHTML = title;
+      document.getElementById('root').innerHTML = `
+        <h3>${title}:</h3>
+        <div class="row">
+          <label for="id-lable">ID:</label>
+          <label id="id-lable">${book.id}</label>
+        </div>
+        <div class="row">
+          <label for="title-lable">Title:</label>
+          <label id="title-lable">${book.title}</label>
+        </div>
+        <div class="row">
+          <label for="book-author-lable">Author:</label>
+          <label id="book-author-lable">${book.author.name}</label>
+        </div>
+        <div class="row">
+          <label for="book-genre-lable">Genre:</label>
+          <label id="book-genre-lable">${book.genre.name}</label>
+        </div>`;
+      if (request.command === 'delete') {
+        document.getElementById('buttons').innerHTML = `
+            <button type="button" onclick="deleteBook(${book.id})">Delete</button>
+            <a href="/"><button type="button">Cancel</button></a>`;
+      }
+    }
+
+  </script>
+
+</body>
+</html>

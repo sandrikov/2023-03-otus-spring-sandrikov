@@ -1,0 +1,20 @@
+spring:
+  main:
+    banner-mode: "off"
+
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
+
+  sql:
+    init:
+      data-locations: classpath:data-test.sql
+
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+logging:
+  level:
+    ROOT: ERROR
+
