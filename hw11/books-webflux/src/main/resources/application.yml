@@ -1,0 +1,32 @@
+spring:
+  port: 8080
+  messages:
+    encoding: UTF-8
+
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
+
+#  r2dbc:
+#    url: r2dbc:postgresql://localhost:5432/booksDB
+#    username: postgres
+#    password: postgres
+#  flyway:
+#    url: jdbc:postgresql://localhost:5432/booksDB
+#    user: postgres
+#    password: postgres
+
+  application:
+    name: Books app. WebFlux
+
+server:
+  error:
+    include-stacktrace: always
+    include-exception: true
+    include-message: always
+
+logging:
+  level:
+    ROOT: ERROR
+    ru.otus: ERROR
+#    io.r2dbc.postgresql.QUERY: DEBUG # for queries
+#    io.r2dbc.postgresql.PARAM: DEBUG # for parameters
