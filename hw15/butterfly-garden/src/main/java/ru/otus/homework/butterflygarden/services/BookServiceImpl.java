@@ -1,0 +1,226 @@
+package ru.otus.homework.butterflygarden .services;
+
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.otus.homework.butterflygarden.domain.Author;
+import ru.otus.homework.butterflygarden.domain.Book;
+import ru.otus.homework.butterflygarden.domain.Genre;
+import ru.otus.homework.butterflygarden.dto.BookDto;
+import ru.otus.homework.butterflygarden.dto.BookProjection;
+import ru.otus.homework.butterflygarden.mappers.BookMapper;
+import ru.otus.homework.butterflygarden.repository.BookRepository;
+import ru.otus.homework.butterflygarden.security.AuthUtils;
+import ru.otus.homework.butterflygarden.services.misc.EntityNotFoundException;
+import ru.otus.homework.butterflygarden.services.misc.ServiceUtils;
+
+import java.util.List;
+import java.util.Objects;
+
+import static ru.otus.homework.butterflygarden.services.ServiceResponse.done;
+import static ru.otus.homework.butterflygarden.services.ServiceResponse.error;
+
+@RequiredArgsConstructor
+@Service
+public class BookServiceImpl implements BookService {
+
+    public static final String BOOK_NOT_FOUND = "Book is not found: %s";
+
+    public static final String BOOK_ALREADY_EXISTS = "Book already exists: %s '%s'";
+
+    private final BookRepository bookRepository;
+
+    private final AuthorService authorService;
+
+    private final GenreService genreService;
+
+    private final CommentService commentService;
+
+    private final BookMapper bookMapper;
+
+    @Transactional(readOnly = true)
+    // TODO PostFilter does not work
+    //@PostFilter("filterObject.ageLimit < 16 or not hasRole('CHILD')")
+    @Override
+    public List<BookProjection> listBooks() {
+        val books = bookRepository.findAllBookProjections();
+        if (AuthUtils.hasRole("CHILD")) {
+            return books.stream().filter(b -> b.ageLimit() < 16).toList();
+        }
+        return books;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ServiceResponse<List<BookProjection>> listBooks(Long authorId, Long genreId, String title) {
+        try {
+            return done(findData(authorId, genreId, title));
+        } catch (EntityNotFoundException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ServiceResponse<BookDto> getBook(long id) {
+        try {
+            return done(bookMapper.toDto(findBook(id)));
+        } catch (EntityNotFoundException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ServiceResponse<BookProjection> getBookProjection(Long id) {
+        try {
+            val book = findBook(id);
+            long commentCount = commentService.countByBookId(book.getId());
+            return done(bookMapper.toBookProjection(book, commentCount));
+        } catch (EntityNotFoundException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    @Transactional
+    @Override
+    public ServiceResponse<BookProjection> createBook(String title, Long authorId, Long genreId, Integer ageLimit) {
+        Author author;
+        Genre genre;
+        try {
+            author = authorService.findAuthor(authorId);
+            genre = genreService.findGenre(genreId);
+        } catch (EntityNotFoundException e) {
+            return error(e.getMessage());
+        }
+        if (bookRepository.findByTitleAndAuthor(title, author).isPresent()) {
+            return error(String.format(BOOK_ALREADY_EXISTS, author.getName(), title));
+        }
+        var book = new Book(title, author, genre, ageLimit);
+        bookRepository.save(book);
+        return done(bookMapper.toBookProjection(book, 0L));
+    }
+
+    @Transactional
+    @Override
+    public ServiceResponse<BookProjection> modifyBook(Long id, String title, Long authorId,
+                                                      Long genreId, Integer ageLimit) {
+        try {
+            val author = authorService.findAuthor(authorId);
+            val genre = genreService.findGenre(genreId);
+            val book = findBook(id);
+            if (title != null || author != null) {
+                val existingBook = bookRepository.findByTitleAndAuthor(title != null ? title : book.getTitle(),
+                        author != null ? author : book.getAuthor());
+                if (existingBook.filter(b -> id != b.getId()).isPresent()) {
+                    return error(String.format(BOOK_ALREADY_EXISTS, existingBook.get().getAuthor().getName(),
+                            existingBook.get().getTitle()));
+                }
+            }
+            partialUpdate(book, title, genreId, author, genre);
+            bookRepository.save(book);
+            long commentCount = commentService.countByBookId(book.getId());
+            return done(bookMapper.toBookProjection(book, commentCount));
+        } catch (EntityNotFoundException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    @Override
+    public ServiceResponse<BookDto> modifyBook(BookDto bookDto) {
+        try {
+            val author = authorService.findAuthor(bookDto.getAuthor().getId());
+            genreService.findGenre(bookDto.getGenre().getId()); // check exists only
+            val book = findBook(bookDto.getId());
+            if (!Objects.equals(bookDto.getTitle(), book.getTitle())
+                    || !Objects.equals(author, book.getAuthor())) {
+                val existingBook = bookRepository.findByTitleAndAuthor(bookDto.getTitle(), author);
+                if (existingBook.filter(b -> book.getId() != b.getId()).isPresent()) {
+                    return error(String.format(BOOK_ALREADY_EXISTS, existingBook.get().getAuthor().getName(),
+                            existingBook.get().getTitle()));
+                }
+            }
+            bookMapper.partialUpdate(bookDto, book);
+            bookRepository.save(book);
+            return done(bookMapper.toDto(book));
+        } catch (EntityNotFoundException e) {
+            return error(e.getMessage());
+        }
+    }
+
+
+    @Transactional
+    @Override
+    public ServiceResponse<BookProjection> deleteBook(long id) {
+        try {
+            var book = findBook(id);
+            bookRepository.delete(book);
+            return done(bookMapper.toBookProjection(book, 0L));
+        } catch (EntityNotFoundException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    @Transactional
+    @Override
+    public ServiceResponse<Integer> deleteBooks(Long authorId, Long genreId) {
+        try {
+            val author = authorService.findAuthor(authorId);
+            val genre = genreService.findGenre(genreId);
+            val books = bookRepository.findAll(bookRepository.createExample(author, genre, null, null));
+            if (books.isEmpty()) {
+                return done(0);
+            }
+            val bookIds = books.stream().map(Book::getId).toList();
+            commentService.deleteComments(bookIds);
+            bookRepository.deleteAllInBatch(books);
+            return done(books.size());
+        } catch (EntityNotFoundException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    @Override
+    public Book findBook(Long bookId) throws EntityNotFoundException {
+        return ServiceUtils.findById(bookId, bookRepository::findById, BOOK_NOT_FOUND);
+    }
+
+    @Override
+    public boolean existsByAuthorId(long authorId) {
+        return bookRepository.existsByAuthorId(authorId);
+    }
+
+    @Override
+    public boolean existsByGenreId(long genreId) {
+        return bookRepository.existsByGenreId(genreId);
+    }
+
+    private List<BookProjection> findData(Long authorId, Long genreId, String title) throws EntityNotFoundException {
+        if (authorId == null && genreId == null && title == null) {
+            return bookRepository.findAllBookProjections();
+        }
+        val author = authorService.findAuthor(authorId);
+        val genre = genreService.findGenre(genreId);
+        val books = bookRepository.findAll(bookRepository.createExample(author, genre, title, null));
+        val bookIds = books.stream().map(Book::getId).toList();
+        val commentCountOfBooks = commentService.countGroupByBookId(bookIds);
+        return books.stream()
+                .map(book -> bookMapper.toBookProjection(book,
+                        commentCountOfBooks.getOrDefault(book.getId(), 0L)))
+                .toList();
+    }
+
+    private void partialUpdate(Book book, String title, Long genreId, Author author, Genre genre) {
+        if (title != null) {
+            book.setTitle(title);
+        }
+        if (author != null) {
+            book.setAuthor(author);
+        }
+        if (genreId != null) {
+            book.setGenre(genre);
+        }
+    }
+
+}
