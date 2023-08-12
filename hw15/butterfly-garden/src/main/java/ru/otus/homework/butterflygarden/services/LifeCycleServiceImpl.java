@@ -1,14 +1,15 @@
 package ru.otus.homework.butterflygarden.services;
 
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.RandomUtils;
+import org.springframework.stereotype.Service;
 import ru.otus.homework.butterflygarden.domain.Butterfly;
 import ru.otus.homework.butterflygarden.domain.Caterpillar;
 import ru.otus.homework.butterflygarden.domain.Pupa;
+
+import java.util.function.Function;
 
 @Service
 @Log4j2
@@ -18,20 +19,20 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 	private final Sleeper sleeper;
 
 	@Override
-	public Pupa growCaterpillar(Caterpillar caterpillar) {
-		log.info("{} growing... ", caterpillar);
-		sleeper.sleep (200);
-		val pupa = new Pupa(caterpillar);
-		log.info("{} turned into {}", caterpillar, pupa);
-		return pupa;
+	public Pupa growPupa(Caterpillar caterpillar) {
+		return grow(caterpillar, Pupa::new, 100, 200);
 	}
 
 	@Override
-	public Butterfly growPupa(Pupa pupa) {
-		log.info("{} growing... ", pupa);
-		sleeper.sleep (200);
-		val butterfly = new Butterfly(pupa);
-		log.info("{} turned into {}", pupa, butterfly);
-		return butterfly;
+	public Butterfly growButterfly(Pupa pupa) {
+		return grow(pupa, Butterfly::new, 200, 300);
+	}
+
+	private <F,T> T grow(F source, Function<F,T> transmutation, long minGrowingTime, long maxGrowingTime) {
+		log.info("{} growing... ", source);
+		sleeper.sleep(RandomUtils.nextLong(minGrowingTime, maxGrowingTime));
+		val result = transmutation.apply(source);
+		log.info("Turned into {}", result);
+		return result;
 	}
 }
