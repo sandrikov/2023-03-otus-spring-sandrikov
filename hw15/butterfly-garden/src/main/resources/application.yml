@@ -1,0 +1,9 @@
+spring:
+  messages:
+    encoding: UTF-8
+  application:
+    name: Butterfly Garden. Spring JMS Integration version
+
+logging:
+  level:
+    ROOT: INFO
