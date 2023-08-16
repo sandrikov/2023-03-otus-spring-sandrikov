@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Add book</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+        select {
+            display: inline-block;
+            width: 205px;
+            border: 1px solid steelblue;
+        }
+        input {
+            width: 200px;
+            border: 1px solid steelblue;
+        }
+        input:read-only {
+            background: lightgray;
+        }
+        .row {
+            margin-top: 10px;
+        }
+        .errors {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<form id="add-form" action="bookAdd.html" th:method="post" th:action="@{/book/add}" th:object="${book}">
+    <h3>Add Book:</h3>
+
+    <div class="row">
+        <label for="book-title-input">Title:</label>
+        <input id="book-title-input" name="title" type="text" required th:field="*{title}"/>
+        <div class="errors" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Wrong title book error</div>
+    </div>
+
+    <div class="row">
+        <label for="book-author-select">Author:</label>
+        <select id="book-author-select" name="author" required th:field="*{author.id}">
+            <option value="0" hidden>Select an author</option>
+            <option th:each="a : ${authors}"
+                    th:value="${a.id}" th:text="${a.name}">
+        </select>
+    </div>
+
+    <div class="row">
+        <label for="book-genre-select">Genre:</label>
+        <select id="book-genre-select" name="genre" required th:field="*{genre.id}">
+            <option value="0" hidden>Select author role</option>
+            <option th:each="g : ${genres}"
+                    th:value="${g.id}" th:text="${g.name}">
+        </select>
+    </div>
+
+    <div class="row">
+        <label for="book-age-limit-input">Age limit:</label>
+        <input id="book-age-limit-input" name="ageLimit" type="number" required value="0" th:value="*{ageLimit}"/>
+        <div class="errors" th:if="${#fields.hasErrors('ageLimit')}" th:errors="*{ageLimit}">Wrong age limit error</div>
+    </div>
+
+    <div class="row">
+        <button type="submit" th:value="${book}">Save</button>
+        <a href="bookList.html" th:href="@{/}"><button type="button">Cancel</button></a>
+    </div>
+</form>
+
+</body>
+</html>
