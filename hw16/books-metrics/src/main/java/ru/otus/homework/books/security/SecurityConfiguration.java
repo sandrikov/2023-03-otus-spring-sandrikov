@@ -38,6 +38,8 @@ public class SecurityConfiguration {
                 .csrf((csrf) -> csrf.disable())
                 .sessionManagement((sm) -> sm.sessionCreationPolicy(ALWAYS))
                 .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/monitor/health/**").permitAll()
+                        .requestMatchers("/hal/**", "/monitor/**").hasAnyRole("ADMIN")
                         .requestMatchers("/book/**").hasAnyRole("EDITOR")
                         .anyRequest().authenticated()
                 )

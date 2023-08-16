@@ -1,6 +1,7 @@
 package ru.otus.homework.books.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import static ru.otus.homework.books.services.ServiceResponse.error;
 
 @RequiredArgsConstructor
 @Service
+@Log4j2
 public class BookServiceImpl implements BookService {
 
     public static final String BOOK_NOT_FOUND = "Book is not found: %s";

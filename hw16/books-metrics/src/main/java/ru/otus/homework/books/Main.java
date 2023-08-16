@@ -10,16 +10,22 @@ public class Main {
         SpringApplication.run(Main.class);
 
         System.out.println("""
-                Чтобы перейти на страницу сайта открывай: http://localhost:8080
 
-                Роль EDITOR разрешает изменения.
-                Роль CHILD скрывает книги "для взрослых".
+                Cтраница сайта           : http://localhost:8080
+
+                Аctuator                 : http://localhost:8080/monitor                       (!) admin only
+                Logfile                  : http://localhost:8080/monitor/logfile               (!) admin only
+                Healthchecks             : http://localhost:8080/monitor/health
+                Собственный HealthCheck  : http://localhost:8080/monitor/health/authenticated
+                 - UP - авторизованный доступ
+                 - UNKNOWN - анонимный доступ
+                HAL explorer             : http://localhost:8080/hal                           (!) admin only
 
                 Пользователи:
+                 - admin     - EDITOR,ADMIN
                  - adult     - USER
                  - user      - USER,CHILD
                  - librarian - EDITOR
-                 - admin     - EDITOR,ADMIN
                  - guest     - not enabled
 
                 Пароль одинаковый: 'password'

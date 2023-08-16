@@ -1,4 +1,30 @@
+management:
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: "*"
+        exclude: "shutdown"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
+    status:
+      order: "down,unknown,up"
+
 spring:
+  application:
+    name: Books app. Metrics, healthcheck and logfile
+
+  jmx:
+    enabled: true
+
+  data:
+    rest:
+      basePath: /hal
+
   messages:
     encoding: UTF-8
 
@@ -20,8 +46,6 @@ spring:
         format_sql: false
     show-sql: true
 
-  application:
-    name: Books app. Thymeleaf version with Spring Security
 
 
   mvc:
@@ -42,6 +66,8 @@ server:
 #      web-allow-others: true
 
 logging:
+  file.name: target/app.log
   level:
     ROOT: ERROR
     org.springframework.security: ERROR
+    ru.otus.homework.books: INFO
