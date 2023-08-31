@@ -1,62 +1,48 @@
-create table genres
-(
-    id   bigint auto_increment,
-    name varchar(128) not null,
-    primary key (id)
-);
-alter table genres
-    add constraint "UK_genre_name" unique (name);
+-- create database if not exists "booksdb"
+--     with owner = postgres
+--     encoding = 'UTF8'
+--     connection limit = -1;
 
-create table authors
-(
-    id   bigint auto_increment,
+create table if not exists genres (
+    id   bigserial primary key,
     name varchar(128) not null,
-    primary key (id)
+    constraint "UK_genre_name" unique (name)
 );
-alter table authors
-    add constraint "UK_author_name" unique (name);
 
-create table books
-(
-    id        bigint auto_increment,
+create table if not exists authors (
+    id   bigserial primary key,
+    name varchar(128) not null,
+    constraint "uk_author_name" unique (name)
+);
+
+create table if not exists books (
+    id        bigserial primary key,
     title     varchar(128) not null,
     author_id bigint       not null,
     genre_id  bigint       not null,
     age_limit integer      not null,
-    primary key (id)
+    constraint "UK_book_name_author" unique (title, author_id),
+    constraint "FK_book_author" foreign key (author_id) references authors(id),
+    constraint "FK_book_genre" foreign key (genre_id) references genres(id)
 );
-alter table books
-    add constraint "UK_book_name_author" unique (title, author_id);
-alter table books
-    add constraint "FK_book_author"
-        foreign key (author_id) references authors;
-alter table books
-    add constraint "FK_book_genre"
-        foreign key (genre_id) references genres;
 
-create table comments
-(
-    id      bigint auto_increment,
+create table if not exists comments (
+    id      bigserial primary key,
     book_id bigint        not null,
     text    varchar(1024) not null,
-    primary key (id)
+    constraint "FK_comment_book" foreign key (book_id) references books(id)
 );
-alter table comments
-    add constraint "FK_comment_book"
-        foreign key (book_id) references books;
 
-create table users
-(
-    username varchar_ignorecase(50)  not null primary key,
-    password varchar_ignorecase(500) not null,
+create table if not exists users (
+    username varchar(50)  not null primary key,
+    password varchar(500) not null,
     enabled  boolean                 not null
 );
-create table authorities
-(
-    id        bigint auto_increment,
-    username  varchar_ignorecase(50) not null,
-    authority varchar_ignorecase(50) not null,
-    primary key (id) ,
-    constraint fk_authorities_users foreign key (username) references users (username)
+
+create table if not exists authorities (
+    id        bigserial primary key,
+    username  varchar(50) not null,
+    authority varchar(50) not null,
+    constraint "UK_auth_username" unique (username, authority),
+    constraint FK_authorities_users foreign key (username) references users (username)
 );
-create unique index ix_auth_username on authorities (username, authority);

@@ -3,8 +3,10 @@ spring:
     encoding: UTF-8
 
   datasource:
-    url: jdbc:h2:mem:testdb
-    initialization-mode: never
+    url: jdbc:postgresql://localhost:5432/bookdb
+    username: postgres
+    password: postgres
+    initialization-mode:
   sql:
     init:
       mode: always
@@ -17,7 +19,7 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
     show-sql: true
 
   application:

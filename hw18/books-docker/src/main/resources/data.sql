@@ -1,10 +1,10 @@
-insert into genres (id, `name`)
+insert into genres (id, name)
 values (default, 'Adventure fiction'),    -- 1
        (default, 'Autobiography'),        -- 2
        (default, 'Detective'),            -- 3
        (default, 'Erotic romance novel'); -- 4
 
-insert into authors (id, `name`)
+insert into authors (id, name)
 values (default, 'Mark Twain'),      -- 1
        (default, 'Agatha Christie'), -- 2
        (default, 'Leo Tolstoy'),     -- 3
@@ -22,7 +22,7 @@ values (default, 'The Murder on the Links', 2, 3, 16),        -- 1
 insert into comments (id, book_id, text)
 values (default, 1, 'Comment №1 The Murder on the Links'),
        (default, 1, 'Comment №2 The Murder on the Links'),
-       --(default, 2, 'The Secret of Chimneys'),  -- 2 w/o comment
+       (default, 2, 'The Secret of Chimneys'),  -- 2 w/o comment
        (default, 3, 'Comment №1 Adventures of Huckleberry Finn'),
        (default, 4, 'Comment №1 The Adventures of Tom Sawyer'),
        (default, 5, 'Comment №1 Tom Sawyer Abroad'),
@@ -30,11 +30,11 @@ values (default, 1, 'Comment №1 The Murder on the Links'),
 ;
 
 INSERT INTO users (username, password, enabled)
-values ('child', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', 1),
-       ('adult', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', 1),
-       ('admin', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', 1),
-       ('librarian', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', 1),
-       ('guest', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', 0)
+values ('child', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', true),
+       ('adult', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', true),
+       ('admin', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', true),
+       ('librarian', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', true),
+       ('guest', '$2a$10$bltA1SzOChKZIYJe47s0IuboUDNJLY6KgLj76orBDSsgjUbd3NCla', false)
 ;
 
 INSERT INTO authorities (id, username, authority)

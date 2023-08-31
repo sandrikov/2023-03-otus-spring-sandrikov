@@ -16,10 +16,10 @@ public class Main {
                 Роль CHILD скрывает книги "для взрослых".
 
                 Пользователи:
-                 - adult     - USER
-                 - user      - USER,CHILD
-                 - librarian - EDITOR
                  - admin     - EDITOR,ADMIN
+                 - adult     - USER
+                 - child     - USER,CHILD
+                 - librarian - EDITOR
                  - guest     - not enabled
 
                 Пароль одинаковый: 'password'
