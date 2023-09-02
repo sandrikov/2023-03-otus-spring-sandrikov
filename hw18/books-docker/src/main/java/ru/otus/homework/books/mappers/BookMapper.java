@@ -16,7 +16,7 @@ public interface BookMapper {
 
     default BookProjection toBookProjection(Object... data) {
         Assert.notEmpty(data, "Expected Book and numberOfComments");
-        Assert.isTrue(data.length == 2, "Expected Book and numberOfComments");
+        Assert.isTrue(data.length == 4, "Expected Book and numberOfComments");
         Assert.isInstanceOf(Book.class, data[0], "The 1st param expected Book");
         Assert.isInstanceOf(Long.class, data[1], "The 2nd param expected Long");
         return toBookProjection((Book) data[0], (Long) data[1]);

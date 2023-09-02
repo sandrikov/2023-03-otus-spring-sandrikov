@@ -25,12 +25,12 @@ public interface BookRepository extends JpaRepository<Book, Long>, ListQueryByEx
     Optional<Book> findByTitleAndAuthor(String title, Author author);
 
     @Query("""
-            select b, count(c)
+            select b, count(c), b.author, b.genre
               from Book b
                     join fetch b.author
                     join fetch b.genre
                     left join Comment c on b = c.book
-              group by b""")
+              group by b, b.author, b.genre""")
     List<Object[]> findAllBookWithCommentCount();
 
     boolean existsByAuthorId(long authorId);

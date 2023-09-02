@@ -1,8 +1,3 @@
--- create database if not exists "booksdb"
---     with owner = postgres
---     encoding = 'UTF8'
---     connection limit = -1;
-
 create table if not exists genres (
     id   bigserial primary key,
     name varchar(128) not null,

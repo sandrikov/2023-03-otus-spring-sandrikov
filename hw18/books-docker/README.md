@@ -1,20 +1,30 @@
 # Books. Docker version 
-
-
-## Сборка проекта
+<!-- TOC -->
+* [Packaging as jar](#packaging-as-jar)
+* [Using Docker](#using-docker)
+* [Users](#users)
+<!-- TOC -->
+## Packaging as jar
+To build the final jar of the books application for production, run:
 ```
 mvn clean package
 ```
-
-
-## Сборка образа вручную
+## Using Docker
+To start the books application with postgresql database in a docker container, run:
 ```
-docker build -t book-image:v1 .
-docker run -p:8080:8080 --rm book-image:v1
+docker-compose up -d
 ```
-## Служба снабжения
-Служба снабжения [SupplierService](src/main/java/ru/otus/homework/butterflygarden/services/SupplierService.java)
-через `supplierChannel` поставляет в бабочкарий партии [Shipment](src/main/java/ru/otus/homework/butterflygarden/domain/Shipment.java)
-гусениц [Caterpillar](src/main/java/ru/otus/homework/butterflygarden/domain/Caterpillar.java) разного размера.   
+Then navigate to [http://localhost:8080](http://localhost:8080) in your browser.
 
-
+To stop it, run:
+```
+docker-compose down
+```
+## Users
+| User      | Password | Role          |
+|-----------|:--------:|:--------------|
+| admin     | password | EDITOR, ADMIN |
+| adult     | password | USER          |
+| child     | password | USER, CHILD   |
+| librarian | password | USER          |
+| guest     | password | not enabled   |
