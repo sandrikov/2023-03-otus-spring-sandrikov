@@ -1,0 +1,24 @@
+version: '1.0'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://app-db:5432/bookdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+  app-db:
+    image: "postgres:15.4"
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=bookdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+#      - ~/volumes/books/postgresql/:/var/lib/postgresql/data/
+      - ./src/main/resources/db:/docker-entrypoint-initdb.d
