@@ -1,0 +1,50 @@
+spring:
+  messages:
+    encoding: UTF-8
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bookdb
+    username: postgres
+    password: postgres
+  sql:
+    init:
+      mode: never
+    show-sql: true
+
+  jpa:
+    defer-datasource-initialization: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: true
+
+  application:
+    name: Books app. Thymeleaf version with Spring Security
+
+
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+server:
+  error:
+    include-stacktrace: always
+    include-exception: true
+    include-message: always
+
+#h2:
+#  console:
+#    path: /h2-consol
+#    settings:
+#      web-allow-others: true
+
+logging:
+  level:
+    ROOT: ERROR
+    org.springframework.security: ERROR

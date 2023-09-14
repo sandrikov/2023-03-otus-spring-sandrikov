@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Delete book</title>
+  <style>
+    body {
+      padding: 50px;
+    }
+    label {
+      display: inline-block;
+      width: 100px;
+    }
+    select {
+      display: inline-block;
+      width: 205px;
+      border: 1px solid steelblue;
+    }
+    input {
+      width: 200px;
+      border: 1px solid steelblue;
+    }
+    input:read-only {
+      background: lightgray;
+    }
+    .row {
+      margin-top: 10px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <h3>Book Info:</h3>
+
+  <div class="row">
+    <label for="id-lable">ID:</label>
+    <label id="id-lable" th:text="${book.id}">2</label>
+  </div>
+
+  <div class="row">
+    <label for="book-title-lable">Title:</label>
+    <label id="book-title-lable" th:text="${book.title}">The Adventures of Tom Sawyer</label>
+  </div>
+
+  <div class="row">
+    <label for="book-author-lable">Author:</label>
+    <label id="book-author-lable" th:text="${book.author.name}">Mark Twain</label>
+  </div>
+
+  <div class="row">
+    <label for="book-genre-lable">Genre:</label>
+    <label id="book-genre-lable" th:text="${book.genre.name}">Adventure fiction</label>
+  </div>
+
+  <div class="row">
+    <label for="book-age-limit-lable">Age limit:</label>
+    <label id="book-age-limit-lable" th:text="${book.ageLimit + '+'}">18</label>
+  </div>
+
+  <form id="delete-form" action="bookDelete.html" th:method="delete"
+       th:action="@{/book/{id}/delete(id=${book.id})}">
+    <div class="row">
+      <button type="submit">Delete</button>
+      <a href="bookList.html" th:href="@{/}"><button type="button">Cancel</button></a>
+    </div>
+  </form>
+
+</body>
+</html>
