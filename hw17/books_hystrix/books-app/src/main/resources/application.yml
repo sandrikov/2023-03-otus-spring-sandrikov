@@ -1,4 +1,32 @@
+management:
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: "*"
+        exclude: "shutdown"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
+    status:
+      order: "down,unknown,up"
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+        resilience4j:
+          circuitbreaker:
+            calls: true
+
 spring:
+  application:
+    name: books-app
+
   messages:
     encoding: UTF-8
 
@@ -22,10 +50,6 @@ spring:
       hibernate:
         format_sql: false
     show-sql: true
-
-  application:
-    name: Books app. Thymeleaf version with Spring Security
-
 
   mvc:
     hiddenmethod:
