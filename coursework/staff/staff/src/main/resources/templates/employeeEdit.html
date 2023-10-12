@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <title th:if="${action=='edit'}" th:text="${employee.firstName} + ' ' + ${employee.lastName}">Matthew Weiss</title>
+    <title th:if="${action=='add'}">Create employee</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+        .container {
+            max-width: 900px;
+            _width: 480px;
+            margin: 0 auto;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+        }
+        select {
+            display: inline-block;
+            width: 305px;
+            border: 1px solid steelblue;
+        }
+        input {
+            width: 300px;
+            border: 1px solid steelblue;
+        }
+        input:read-only {
+            background: lightgray;
+        }
+        .narrow-input {
+            width: 150px;
+        }
+        .row {
+            margin-top: 10px;
+            padding: 6px 2px;
+            width: 500px;
+        }
+        .errors {
+            color: red;
+        }
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 6px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 2px 1px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form id="edit-form" action="employeeEdit.html" th:method="post" th:object="${employee}"
+          th:with="url='/employee/' + ( (${action} == 'edit')? *{employeeId} + '/' : '') + ${action}"
+          th:action="@{${url}}">
+        <h1>Employee Info:</h1>
+
+        <div class="row" th:hidden="${action=='add'}">
+            <label for="id-input">ID:</label>
+            <input id="id-input" type="number" name="employeeId" required readonly value="20" th:value="*{employeeId}"/>
+        </div>
+
+        <div class="row">
+            <label for="employee-first-name-input">First name:</label>
+            <input id="employee-first-name-input" name="firstName" type="text" required value="Matthew"
+                   th:value="*{firstName}"/>
+            <div class="errors" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Wrong employee first
+                name
+            </div>
+        </div>
+
+        <div class="row">
+            <label for="employee-last-name-input">Last name:</label>
+            <input id="employee-last-name-input" name="lastName" type="text" required value="Weiss"
+                   th:value="*{lastName}"/>
+            <div class="errors" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">Wrong employee last
+                name
+            </div>
+        </div>
+
+        <div class="row">
+            <label for="employee-department-select">Department:</label>
+            <select id="employee-department-select" name="department" required th:field="*{department.departmentId}">
+                <option value="" hidden th:if="${action=='add'}">Select department</option>
+                <option th:each="e : ${#lists.sort(departments)}"
+                        th:value="${e.departmentId}" th:text="${e.departmentName}"
+                        th:selected="${e.departmentId}==*{department.departmentId}">Quality Assurance
+                </option>
+                >
+            </select>
+        </div>
+
+        <div class="row">
+            <label for="employee-job-select">Job title:</label>
+            <select id="employee-job-select" name="job" required th:field="*{job.jobId}">
+                <option value="" hidden th:if="${action=='add'}">Select job</option>
+                <option th:each="e : ${#lists.sort(jobs)}"
+                        th:value="${e.jobId}" th:text="${e.jobTitle}"
+                        th:selected="${e.jobId}==*{job.jobId}">Quality Assurance Manager
+                </option>
+                >
+            </select>
+        </div>
+
+        <div class="row">
+            <label for="employee-manager-select">Manager:</label>
+            <select id="employee-manager-select" name="manager" th:field="*{manager.employeeId}">
+                <option value="">None</option>
+                <option th:each="e : ${#lists.sort(employees)}"
+                        th:value="${e.employeeId}" th:text="${e.firstName} + ' ' + ${e.lastName}"
+                        th:selected="${e.employeeId}==*{manager.employeeId}">Neena Yang
+                </option>
+                >
+            </select>
+        </div>
+
+        <div class="row">
+            <label for="employee-email-input">E-mail:</label>
+            <input id="employee-email-input" name="email" type="text" required value="MWEISS" th:value="*{email}"/>
+            <div class="errors" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Wrong e-mail</div>
+        </div>
+
+        <div class="row">
+            <label for="employee-phone-number-input">Phone number:</label>
+            <input id="employee-phone-number-input" name="phoneNumber" type="tel" required value="+7(990)555-0104" class="narrow-input"
+                   th:value="*{phoneNumber}"/>
+            <div class="errors" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}">Wrong phone
+                number
+            </div>
+        </div>
+
+        <div class="row">
+            <label for="employee-hire-date-input">Hire date:</label>
+            <input id="employee-hire-date-input" name="hireDate" type="date" required value="2007-06-13" class="narrow-input"
+                   th:value="*{hireDate}"/>
+            <div class="errors" th:if="${#fields.hasErrors('hireDate')}" th:errors="*{hireDate}">Wrong hire date</div>
+        </div>
+
+        <div class="row">
+            <label for="employee-salary-input">Salary $:</label>
+            <input id="employee-salary-input" name="salary" type="number" min="1" step="any" value="8000"
+                   th:value="*{salary}"/>
+            <div class="errors" th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}">Wrong salary</div>
+        </div>
+
+        <!--    ${#calendars.createNow()}-->
+        <div class="row">
+            <button class="button" type="submit" th:value="${employee}">Save</button>
+        </div>
+    </form>
+    <hr>
+    <a th:if="${departmentId}"
+       th:with="url='/department/' + ${departmentId}"
+       th:href="@{${url}}" href="departmentView.html">Back</a>
+    <a th:unless="${departmentId}"
+       th:href="@{/}" href="departmentList.html">Back to department list</a>
+</div>
+</body>
+</html>

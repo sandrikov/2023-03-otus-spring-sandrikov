@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${job.jobTitle}">Matthew Weiss</title>
+  <style>
+    body {
+      padding: 50px;
+    }
+    .text-bold {
+      font-weight: 700;
+    }
+    .text-lighter {
+      font-weight: lighter;
+    }
+    .dollars:before {
+      content: '$';
+    }
+    .jobs {
+      border:none;
+      font-size: 17px;
+      width: 100%;
+      background: #fff;
+      margin: 1em 0;
+      -webkit-box-shadow: none;
+      box-shadow: none;
+      text-align: left;
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+    .jobs tr td, th {
+      padding: 5px;
+      border: none;
+      width: 25%;
+    }
+    .jobs td:first-child {
+      width: 50px;
+    }
+    .jobs td:last-child {
+      width: 250px;
+    }
+    .topnav {
+      overflow: hidden;
+      background-color: #180C97;
+    }
+    .topnav a {
+      float: left;
+      color: #f2f2f2;
+      text-align: center;
+      padding: 8px 16px;
+      text-decoration: none;
+      font-size: 17px;
+    }
+    .topnav a:hover {
+      background-color: #ddd;
+      color: black;
+    }
+    .topnav-right {
+      float: right;
+    }
+    .button {
+      background-color: #4CAF50; /* Green */
+      border: none;
+      color: white;
+      border-radius: 8px;
+      padding: 6px 12px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 2px 1px;
+      cursor: pointer;
+    }
+    .buttonDelete {
+      background-color: #f44336; /* Red */
+    }
+  </style>
+</head>
+<body>
+<div class="topnav">
+  <a th:href="@{/}" href="departmentList.html">Departments</a>
+  <a th:href="@{/job}" href="jobList.html">Jobs</a>
+  <a th:href="@{/todo}" href="underConstraction.html">Projects</a>
+  <div class="topnav-right">
+    <a th:href="@{/todo}" href="underConstraction.html">Administration</a>
+    <a th:href="@{/todo}" href="underConstraction.html">About</a>
+  </div>
+</div>
+<h1 th:text="${job.jobTitle}">Quality Assurance Manager</h1>
+<div id="job-view">
+  <table class="jobs">
+    <tbody>
+    <tr>
+      <td class="text-lighter">Min Salary</td>
+      <td class="text-bold dollars" th:text="${job.minSalary}">9000</td>
+    </tr>
+    <tr>
+      <td class="text-lighter">Max Salary</td>
+      <td class="text-bold dollars" th:text="${job.maxSalary}">15000</td>
+    </tbody>
+  </table>
+</div>
+
+<div id="delete-block" th:if="${action == 'delete'}">
+  <form id="delete-form" action="jobView.html" th:method="delete"
+        th:action="@{/job/{id}/delete(id=${job.jobId})}">
+    <button class="button buttonDelete" type="submit">Delete</button>
+  </form>
+  <hr>
+  <a th:href="@{/job}" href="jobList.html">Back to job list</a>
+</div>
+
+</body>
+</html>
