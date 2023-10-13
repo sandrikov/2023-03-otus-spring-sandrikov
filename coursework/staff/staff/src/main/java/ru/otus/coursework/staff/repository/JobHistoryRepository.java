@@ -14,7 +14,7 @@ import ru.otus.coursework.staff.repository.dto.JobHistoryRestDto;
  * Spring Data JPA repository for the JobHistory entity.
  */
 @Repository
-@RepositoryRestResource(path = "employee", excerptProjection = JobHistoryRestDto.class)
+@RepositoryRestResource(path = "history", excerptProjection = JobHistoryRestDto.class)
 public interface JobHistoryRepository extends JpaRepository<JobHistory, Long> {
 
 	@EntityGraph("job_history-department-job-employee-entity-graph")
