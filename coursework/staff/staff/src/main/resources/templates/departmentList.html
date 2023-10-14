@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Departments</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+        .departments {
+            border: 1px solid steelblue;
+            width: 600px;
+            border-collapse: collapse;
+        }
+        .departments tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+        .departments td:first-child {
+            width: 25px;
+        }
+        .departments td:nth-child(3) {
+            width: 150px;
+        }
+        .departments td:nth-child(4) {
+            width: 110px;
+            text-align: center;
+        }
+        .topnav {
+            overflow: hidden;
+            background-color: #180C97;
+        }
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .topnav-right {
+            float: right;
+        }
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 6px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 2px 1px;
+            cursor: pointer;
+        }
+        .buttonEdit {
+            background-color: #008CBA; /* Blue */
+            padding: 1px 8px;
+        }
+        .buttonDelete {
+            background-color: #f44336; /* Red */
+            padding: 1px 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="topnav">
+    <a th:href="@{/}" href="departmentList.html">Departments</a>
+    <a th:href="@{/job}" href="jobList.html">Jobs</a>
+    <a th:href="@{/todo}" href="underConstraction.html">Projects</a>
+    <div class="topnav-right">
+        <a th:href="@{/todo}" href="underConstraction.html">Administration</a>
+        <a th:href="@{/todo}" href="underConstraction.html">About</a>
+    </div>
+</div>
+<h3>Departments</h3>
+<table class="departments">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Department name</th>
+        <th>Manager</th>
+        <!-- <th sec:authorize="hasRole('EDIT')">Actions</th>-->
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="department : ${#lists.sort(departments)}">
+        <td th:text="${department.departmentId}">QA</td>
+        <td>
+            <a th:href="@{/department/{id}(id=${department.departmentId})}"
+               th:text="${department.departmentName}" href="departmentView.html">Quality Assurance</a>
+        </td>
+        <td>
+            <a th:href="@{/employee/{id}(id=${department.manager.employeeId})}"
+               th:text="${department.manager.firstName} + ' ' + ${department.manager.lastName}"
+               href="employeeView.html"
+               th:if="${department.manager}">Matthew Weiss</a>
+        </td>
+        <!--        <td sec:authorize="hasRole('EDIT')">-->
+        <td>
+            <a class="button buttonEdit" th:href="@{/department/{id}/edit(id=${department.departmentId})}" href="departmentEdit.html">Edit</a>
+            <a class="button buttonDelete" th:href="@{/department/{id}/delete(id=${department.departmentId})}" href="departmentView.html">Delete</a>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <a class="button" th:href="@{/department/add}" href="departmentEdit.html">Add department</a>
+        </td>
+    </tr>
+<!--    <tr>-->
+<!--        <td colspan="6">-->
+<!--            <a th:href="@{/department/add}" href="departmentAdd.html">Add department</a>-->
+<!--        </td>-->
+<!--    </tr>-->
+    </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: Books app. Metrics, healthcheck and logfile
+  main:
+    banner-mode: "off"
+  messages:
+    encoding: UTF-8
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/create.sql
+      data-locations: classpath:data-test.sql
+  jpa:
+    defer-datasource-initialization: true
+    database: h2
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+

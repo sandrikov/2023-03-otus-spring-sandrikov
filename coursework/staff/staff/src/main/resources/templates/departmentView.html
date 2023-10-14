@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${department.departmentName}">Quality Assurance</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+        .employee {
+            border: 1px solid steelblue;
+            width: 600px;
+            border-collapse: collapse;
+        }
+        .employee tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+        .employee td:first-child {
+            width: 150px;
+        }
+        .departments td:nth-child(3) {
+            width: 110px;
+            align-content: center;
+            text-align: center;
+        }
+        .description {
+            margin-top: .6em;
+            font-size: 1em;
+            line-height: 1.4em;
+            color: #000000de;
+        }
+        .phones {
+            margin-top: 2px;
+            color: #737373;
+        }
+        .topnav {
+            overflow: hidden;
+            background-color: #180C97;
+        }
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .topnav-right {
+            float: right;
+        }
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 6px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 2px 1px;
+            cursor: pointer;
+        }
+        .buttonEdit {
+            background-color: #008CBA; /* Blue */
+            padding: 1px 8px;
+        }
+        .buttonDelete {
+            background-color: #f44336; /* Red */
+            padding: 1px 8px;
+        }
+        .buttonDeleteDepartment {
+            background-color: #f44336; /* Red */
+            margin: 30px 1px;
+        }
+        button:disabled,
+        button[disabled]{
+            background-color: #cccccc;
+            color: #666666;
+        }
+        .errors {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="topnav">
+    <a th:href="@{/}" href="departmentList.html">Departments</a>
+    <a th:href="@{/job}" href="jobList.html">Jobs</a>
+    <a th:href="@{/todo}" href="underConstraction.html">Projects</a>
+    <div class="topnav-right">
+        <a th:href="@{/todo}" href="underConstraction.html">Administration</a>
+        <a th:href="@{/todo}" href="underConstraction.html">About</a>
+    </div>
+</div>
+<div id="hr-main">
+    <h1 th:text="${department.departmentName}">Quality Assurance</h1>
+    <div id="manager" th:if="${department.manager}">
+        <h2>Manager</h2>
+        <a th:href="@{/employee/{id}(id=${department.manager.employeeId},department=${department.departmentId})}"
+           th:text="${department.manager.firstName} + ' ' + ${department.manager.lastName}"
+           href="employeeView.html" style="font-size: 18px;">Matthew Weiss</a>
+        <div class="description">
+            <div class="position" th:text="${department.manager.job.jobTitle}">Administration Vice President</div>
+            <div class="phones"><nobr th:text="${department.manager.phoneNumber}">+7(990)555-0104</nobr></div>
+        </div>
+    </div>
+    <h2 th:unless="${department.manager}">No manager</h2>
+    <div id="employees">
+        <h2>Employees</h2>
+        <table class="employee">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Job title</th>
+                <th th:unless="${action}">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="employee : ${#lists.sort(department.employees)}">
+                <td>
+                    <a th:href="@{/employee/{id}(id=${employee.employeeId},department=${department.departmentId})}"
+                        th:text="${employee.firstName} + ' ' + ${employee.lastName}" href="employeeView.html">Karen Colmenares</a>
+                </td>
+                <td>
+                    <a th:href="@{/job/{id}(id=${employee.job.jobId})}"
+                       th:text="${employee.job.jobTitle}" href="jobView.html">Quality Assurance Manager</a>
+                </td>
+                <td th:unless="${action}">
+                    <a class="button buttonEdit" th:href="@{/employee/{id}/edit(id=${employee.employeeId})}" href="employeeEdit.html">Edit</a>
+                    <a class="button buttonDelete" th:href="@{/employee/{id}/delete(id=${employee.employeeId},department=${department.departmentId})}" href="employeeView.html">Delete</a>
+                </td>
+            </tr>
+            <tr th:unless="${action}">
+                <td colspan="3">
+                    <a class="button" th:href="@{/employee/add(department=${department.departmentId})}" href="departmentEdit.html">Add employee</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="delete-block" th:if="${action == 'delete'}">
+        <form id="delete-form" action="departmentView.html" th:method="delete"
+              th:action="@{/department/{id}/delete(id=${department.departmentId})}">
+            <button class="button buttonDeleteDepartment" type="submit" disabled th:disabled="${not #lists.isEmpty(department.employees)}">Delete department</button>
+            <span class="errors" th:hidden="${#lists.isEmpty(department.employees)}">  First you need to delete all employees</span>
+        </form>
+    </div>
+    <hr>
+    <a th:href="@{/}" href="departmentList.html">Back to department list</a>
+</div>
+</body>
+</html>
+

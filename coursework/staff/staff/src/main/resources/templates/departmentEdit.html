@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <title th:if="${action=='edit'}" th:text="${department.departmentName}">Quality Assurance</title>
+    <title th:if="${action=='add'}">Create department</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+        select {
+            display: inline-block;
+            width: 205px;
+            border: 1px solid steelblue;
+        }
+        input {
+            width: 200px;
+            border: 1px solid steelblue;
+        }
+        input:read-only {
+            background: lightgray;
+        }
+        .row {
+            margin-top: 10px;
+        }
+        .errors {
+            color: red;
+        }
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 6px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 2px 1px;
+            cursor: pointer;
+        }
+    </style>
+
+</head>
+<body>
+<form id="edit-form" action="departmentEdit.html" th:method="post"
+      th:action="@{${posturl}}" th:object="${department}">
+    <h1>Department Info:</h1>
+
+    <div class="row">
+        <label for="id-input">ID:</label>
+        <input id="id-input" type="text" name="departmentId" required th:readonly="${action=='edit'}" value="QA_MAN" th:value="*{departmentId}"/>
+        <div class="errors" th:if="${#fields.hasErrors('departmentId')}" th:errors="*{departmentId}">Wrong department ID</div>
+    </div>
+
+    <div class="row">
+        <label for="department-title-input">Title:</label>
+        <input id="department-title-input" name="departmentName" type="text" required value="Quality Assurance Manager" th:value="*{departmentName}"/>
+        <div class="errors" th:if="${#fields.hasErrors('departmentName')}" th:errors="*{departmentName}">Wrong department title</div>
+    </div>
+
+    <div class="row">
+        <label for="department-manager-select">Manager:</label>
+        <select id="department-manager-select" name="manager" th:field="*{manager.employeeId}">
+            <option value="" >None</option>
+            <option th:each="e : ${#lists.sort(employees)}"
+                    th:value="${e.employeeId}"
+                    th:text="${e.firstName} + ' ' + ${e.lastName}"
+                    th:selected="${e.employeeId}==*{manager.employeeId}">Matthew Weiss</option>>
+        </select>
+    </div>
+
+    <div class="row">
+        <button class="button" type="submit" th:value="${department}">Save</button>
+    </div>
+</form>
+<hr>
+<a th:href="@{/}" href="departmentList.html">Back to department list</a>
+</body>
+</html>

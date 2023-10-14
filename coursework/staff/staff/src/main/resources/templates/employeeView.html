@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${employee.firstName} + ' ' + ${employee.lastName}">Matthew Weiss</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+        .employee {
+            border:none;
+            font-size: 17px;
+            max-width: 800px;
+            _width: 380px;
+            background: #fff;
+            margin: 1em 0;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            text-align: left;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        .employee tr td, th {
+            padding: 5px;
+            border: none;
+            width: 25%;
+        }
+        .employee td:first-child {
+            width: 150px;
+        }
+        .employee td:last-child {
+            width: 350px;
+        }
+        .job-history {
+            border: 1px solid steelblue;
+            width: 800px;
+            border-collapse: collapse;
+        }
+        .job-history tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+        .job-history td:first-child {
+            width: 25px;
+        }
+        .phones {
+            margin-top: 2px;
+            color: #737373;
+        }
+        .subordinate-departments {
+            list-style-type: circle;
+        }
+        .text-bold {
+            font-weight: 700;
+        }
+        .text-lighter {
+            font-weight: lighter;
+        }
+        .dollars:before {
+            content: '$';
+        }
+        .topnav {
+            overflow: hidden;
+            background-color: #180C97;
+        }
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .topnav-right {
+            float: right;
+        }
+        .button {
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 10px 14px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #f44336; /* Red */
+            margin: 30px 1px;
+        }
+    </style>
+</head>
+<body>
+<div class="topnav">
+    <a th:href="@{/}" href="departmentList.html">Departments</a>
+    <a th:href="@{/job}" href="jobList.html">Jobs</a>
+    <a th:href="@{/todo}" href="underConstraction.html">Projects</a>
+    <div class="topnav-right">
+        <a th:href="@{/todo}" href="underConstraction.html">Administration</a>
+        <a th:href="@{/todo}" href="underConstraction.html">About</a>
+    </div>
+</div>
+<h1 th:text="${employee.firstName} + ' ' + ${employee.lastName}">Matthew Weiss</h1>
+<div id="employee-container">
+    <table class="employee">
+        <tbody>
+        <tr>
+            <td class="text-lighter">Department</td>
+            <td class="text-bold">
+                <a th:href="@{/department/{id}(id=${employee.department.departmentId})}"
+                   th:text="${employee.department.departmentName}" href="departmentView.html">Quality Assurance</a>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-lighter">Job title</td>
+            <td class="text-bold">
+                <a th:href="@{/job/{id}(id=${employee.job.jobId})}"
+                   th:text="${employee.job.jobTitle}" href="jobView.html">Quality Assurance Manager</a>
+            </td>
+        </tr>
+        <tr th:if="${employee.manager}">
+            <td class="text-lighter">Manager</td>
+            <td class="text-bold">
+                <a th:href="@{/employee/{id}(id=${employee.manager.employeeId})}"
+                   th:text="${employee.manager.firstName} + ' ' + ${employee.manager.lastName}" href="employeeView.html">Steven King</a>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-lighter">Hire date</td>
+            <td class="text-bold"
+                th:text="${employee.hireDate}">13.06.2007</td>
+        </tr>
+        <tr>
+            <td class="text-lighter">Salary</td>
+            <td class="text-bold dollars"
+                th:text="${employee.salary}">8000</td>
+        </tr>
+        <tr>
+            <td class="text-lighter">PhoneNumber</td>
+            <td class="text-bold"><nobr class="phones" th:text="${employee.phoneNumber}">+7(990)555-0104</nobr></td>
+        </tr>
+        <tr>
+            <td class="text-lighter">email</td>
+            <td class="text-bold">
+                <a th:href="${'mailto:' +  #strings.toLowerCase(employee.email) + '@xxx.com'}"
+                    href="mailto:mweiss@xxx.com">mweiss@xxx.com</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div id="employee-history" th:hidden="${#lists.isEmpty(employee.jobHistories)}">
+        <h3>Job History</h3>
+        <table class="job-history">
+            <thead>
+            <tr>
+                <th>Start</th>
+                <th>End</th>
+                <th>Department</th>
+                <th>Job title</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="jobHistory : ${#lists.sort(employee.jobHistories)}">
+                <!--/*@thymesVar id="startDate" type="java.time.LocalDate"*/-->
+                <td th:text="${jobHistory.startDate}">2013-07-28</td>
+                <td th:text="${jobHistory.endDate}">2021-01-15</td>
+                <td>
+                    <a th:href="@{/department/{id}(id=${jobHistory.department.departmentId})}"
+                       th:text="${jobHistory.department.departmentName}" href="departmentView.html">Quality Assurance</a>
+                </td>
+                <td>
+                    <a th:href="@{/job/{id}(id=${jobHistory.job.jobId})}"
+                       th:text="${jobHistory.job.jobTitle}" href="jobView.html">Quality Assurance Manager</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="subordinate-departments" th:hidden="${#lists.isEmpty(subordinateDepartments)}">
+        <h3>Subordinate Departments</h3>
+        <ul class="subordinate-departments"  th:each="subordinateDepartment : ${#lists.sort(subordinateDepartments)}">
+            <li>
+                <a th:href="@{/department/{id}(id=${subordinateDepartment.departmentId})}"
+                   th:text="${subordinateDepartment.departmentName}" href="departmentView.html">Quality Assurance</a>
+            </li>
+        </ul>
+    </div>
+    <div id="subordinate-employees" th:hidden="${#lists.isEmpty(subordinateEmployees)}">
+        <h3>Subordinate employees</h3>
+        <table class="job-history">
+            <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Department</th>
+                <th>Job title</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="subordinate : ${#lists.sort(subordinateEmployees)}">
+                <td>
+                    <a th:href="@{/employee/{id}(id=${subordinate.employeeId})}"
+                       th:text="${subordinate.firstName} + ' ' + ${subordinate.lastName}" href="employeeView.html">Steven Smith</a>
+                </td>
+                <td>
+                    <a th:href="@{/department/{id}(id=${subordinate.department.departmentId})}"
+                       th:text="${subordinate.department.departmentName}" href="departmentView.html">Quality Assurance</a>
+                </td>
+                <td>
+                    <a th:href="@{/job/{id}(id=${subordinate.job.jobId})}"
+                       th:text="${subordinate.job.jobTitle}" href="jobView.html">Quality Assurance Manager</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="delete-block" th:if="${action == 'delete'}">
+        <form id="delete-form" action="employeeView.html" th:method="delete"
+              th:action="@{/employee/{id}/delete(id=${employee.employeeId})}">
+            <button class="button buttonDelete" type="submit">Delete employee</button>
+        </form>
+    </div>
+    <hr>
+    <a th:if="${departmentId}"
+       th:with="url='/department/' + ${departmentId}"
+       th:href="@{${url}}" href="departmentView.html">Back</a>
+</div>
+</body>
+</html>

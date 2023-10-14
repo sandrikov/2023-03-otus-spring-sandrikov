@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Your request cannot be processed</title>
+    <style>
+        ::-moz-selection {
+            background: #b3d4fc;
+            text-shadow: none;
+        }
+        ::selection {
+            background: #b3d4fc;
+            text-shadow: none;
+        }
+        html {
+            padding: 30px 10px;
+            font-size: 20px;
+            line-height: 1.4;
+            color: #737373;
+            background: #3e8acc;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        html,
+        input {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        body {
+            max-width: 1000px;
+            _width: 500px;
+            padding: 30px 20px 50px;
+            border: 1px solid #b3b3b3;
+            border-radius: 4px;
+            margin: 0 auto;
+            box-shadow:
+                    0 1px 10px #a7a7a7,
+                    inset 0 1px 0 #fff;
+            background: #fcfcfc;
+        }
+        h1 span {
+            color: #bbb;
+        }
+        p {
+            margin: 1em 0;
+        }
+        .container {
+            max-width: 800px;
+            _width: 380px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+            border: 1px solid #b3b3b3;
+            border-radius: 4px;
+            box-shadow:
+                    0 1px 10px #a7a7a7,
+                    inset 0 1px 0 #fff;
+            background: #fcfcfc;
+        }
+        .delail {
+            border: 1px solid steelblue;
+            width: 800px;
+            border-collapse: collapse;
+        }
+        .delail tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+            vertical-align: top;
+            horiz-align: left;
+        }
+        .trace {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Your request cannot be processed <span>:(</span></h1>
+    <p>Sorry, an error has occurred.</p>
+
+    <span>Status:</span>&nbsp;<span th:text="${status}">500</span>&nbsp;(<span th:text="${error}">Internal Server Error</span>)
+    <br/>
+    <span th:if="${!#strings.isEmpty(message)}">
+        <span>Message:</span> <span th:text="${message}">Job already exists. id: AN_CLERK</span><br/>
+    </span>
+    <br/>
+
+</div>
+<div>
+    <table class="delail">
+        <tr th:if="${path}">
+            <td>Path</td>
+            <td th:text="${path}">/job/add</td>
+        </tr>
+        <tr hidden="hidden" th:if="${trace}">
+            <td>Trace</td>
+            <td><pre class="trace" th:text="${trace}">ru.otus.coursework.staff.service.misc.AppServiceException: Job already exists. id : DO_CLERK
+	at ru.otus.coursework.staff.service.impl.JobServiceImpl.createJob(JobServiceImpl.java:48)
+	at ru.otus.coursework.staff.controller.JobController.createJob(JobController.java:70)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)</pre></td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

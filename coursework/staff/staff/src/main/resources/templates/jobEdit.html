@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${job.jobTitle}">Matthew Weiss</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+        select {
+            display: inline-block;
+            width: 205px;
+            border: 1px solid steelblue;
+        }
+        input {
+            width: 200px;
+            border: 1px solid steelblue;
+        }
+        input:read-only {
+            background: lightgray;
+        }
+        .row {
+            margin-top: 10px;
+        }
+        .errors {
+            color: red;
+        }
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 6px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 2px 1px;
+            cursor: pointer;
+        }
+    </style>
+
+</head>
+<body>
+<form id="edit-form" action="jobEdit.html" th:method="post"
+      th:action="@{${posturl}}"  th:object="${job}">
+    <h3>Job Info:</h3>
+
+    <div class="row">
+        <label for="id-input">ID:</label>
+        <input id="id-input" type="text" name="jobId" required th:readonly="${action=='edit'}" value="QA_MAN" th:value="*{jobId}"/>
+        <div class="errors" th:if="${#fields.hasErrors('jobId')}" th:errors="*{jobId}">Wrong job ID</div>
+    </div>
+
+    <div class="row">
+        <label for="job-title-input">Title:</label>
+        <input id="job-title-input" name="jobTitle" type="text" required value="Quality Assurance Manager" th:value="*{jobTitle}"/>
+        <div class="errors" th:if="${#fields.hasErrors('jobTitle')}" th:errors="*{jobTitle}">Wrong job title</div>
+    </div>
+
+    <div class="row">
+        <label for="job-min-salary-input">Min Salary:</label>
+        <input id="job-min-salary-input" name="minSalary" type="number" th:value="*{minSalary}"/>
+        <div class="errors" th:if="${#fields.hasErrors('minSalary')}" th:errors="*{minSalary}">Wrong min salary</div>
+    </div>
+
+    <div class="row">
+        <label for="job-max-salary-input">Max Salary:</label>
+        <input id="job-max-salary-input" name="maxSalary" type="number" th:value="*{maxSalary}"/>
+        <div class="errors" th:if="${#fields.hasErrors('maxSalary')}" th:errors="*{maxSalary}">Wrong max salary</div>
+    </div>
+
+    <div class="row">
+        <button class="button" type="submit" th:value="${job}">Save</button>
+    </div>
+</form>
+<hr>
+<a th:href="@{/job}" href="jobList.html">Back to job list</a>
+
+</body>
+</html>

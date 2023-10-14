@@ -1,0 +1,50 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>This page is under construction</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+        .container {
+            max-width: 800px;
+            _width: 380px;
+            margin: 0 auto;
+        }
+        .topnav {
+            overflow: hidden;
+            background-color: #180C97;
+        }
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .topnav-right {
+            float: right;
+        }
+
+    </style>
+</head>
+<body>
+<div class="topnav">
+    <a th:href="@{/}" href="departmentList.html">Departments</a>
+    <a th:href="@{/job}" href="jobList.html">Jobs</a>
+    <a th:href="@{/todo}" href="underConstraction.html">Projects</a>
+    <div class="topnav-right">
+        <a th:href="@{/todo}" href="underConstraction.html">Administration</a>
+        <a th:href="@{/todo}" href="underConstraction.html">About</a>
+    </div>
+</div>
+<div class="container">
+    <h1>This page is under construction</h1>
+</div>
+</body>
+</html>
